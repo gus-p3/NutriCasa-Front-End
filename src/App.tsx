@@ -1,35 +1,75 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.tsx
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Navbar from './components/Layout/Navbar';
+import Footer from './components/Layout/Footer';
 
-function App() {
-  const [count, setCount] = useState(0)
+// Componente para rutas protegidas
+const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated() ? <>{children}</> : <Navigate to="/login" />;
+};
 
+// Componente para redirigir si ya está autenticado
+const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return !isAuthenticated() ? <>{children}</> : <Navigate to="/dashboard" />;
+};
+
+const AppContent: React.FC = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Giselle hola</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <PrivateRoute>
+                <div className="container mx-auto px-4 py-8">
+                  <h1 className="text-3xl font-bold">Dashboard</h1>
+                  <p className="text-gray-600 mt-4">
+                    ¡Bienvenido a tu espacio personal!
+                  </p>
+                </div>
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/setup" 
+            element={
+              <PrivateRoute>
+                <div className="container mx-auto px-4 py-8">
+                  <h1 className="text-3xl font-bold">Configura tu perfil</h1>
+                  <p className="text-gray-600 mt-4">
+                    Aquí irá el asistente de configuración de 6 pasos
+                  </p>
+                </div>
+              </PrivateRoute>
+            } 
+          />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
+  );
+};
 
-export default App
+const App: React.FC = () => {
+  return (
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
+  );
+};
+
+export default App;
