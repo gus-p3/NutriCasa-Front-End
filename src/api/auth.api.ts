@@ -2,9 +2,6 @@
 import axios, { type AxiosInstance, AxiosError } from 'axios';
 import type { LoginCredentials, RegisterData, AuthResponse, User, ApiError } from '../types';
 
-// Debug: Ver todas las variables de entorno disponibles
-console.log('🔍 Todas las variables:', import.meta.env);
-console.log('🔍 VITE_API_URL específica:', import.meta.env.VITE_API_URL);
 
 const API_URL = import.meta.env.VITE_API_URL 
   ? `${import.meta.env.VITE_API_URL}/auth`

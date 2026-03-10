@@ -7,6 +7,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
+import Recipes from './pages/recipes/Recipes';
+import RecipeDetail from './pages/recipes/RecipeDetail';
+import RecipeCook from './pages/recipes/RecipeCook';
 
 // Componente para rutas protegidas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -29,6 +32,8 @@ const AppContent: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+          
+          {/* Rutas privadas */}
           <Route 
             path="/dashboard" 
             element={
@@ -52,6 +57,32 @@ const AppContent: React.FC = () => {
                     Aquí irá el asistente de configuración de 6 pasos
                   </p>
                 </div>
+              </PrivateRoute>
+            } 
+          />
+
+          {/* Nuevas rutas de recetas */}
+          <Route 
+            path="/recipes" 
+            element={
+              <PrivateRoute>
+                <Recipes />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/recipes/:id" 
+            element={
+              <PrivateRoute>
+                <RecipeDetail />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/recipes/:id/cook" 
+            element={
+              <PrivateRoute>
+                <RecipeCook />
               </PrivateRoute>
             } 
           />
