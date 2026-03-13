@@ -1,0 +1,47 @@
+import React from "react";
+
+const IngredientForm = () => {
+  return (
+    <form>
+
+      <label>Name</label>
+      <input type="text" name="name" />
+
+      <label>Quantity</label>
+      <input type="number" name="quantity" />
+
+      <label>Unit</label>
+      <select name="unit">
+        <option>Unidad(es)</option>
+        <option>Gramos</option>
+        <option>Kilogramos</option>
+        <option>Litros</option>
+        <option>Mililitros</option>
+        <option>Cucharadas</option>
+        <option>Tazas</option>
+      </select>
+
+      <label>Category</label>
+      <select name="category">
+        <option>Lácteos</option>
+        <option>Frutas y Verduras</option>
+        <option>Carnes y Pescados</option>
+        <option>Despensa</option>
+        <option>Bebidas</option>
+        <option>Congelados</option>
+        <option>Otros</option>
+      </select>
+
+      <label>ExpiresAt</label>
+      <input type="date" name="expiresAt" />
+      <small>Opcional</small>
+
+      <button type="submit">Crear</button>
+      <button type="button">Actualizar</button>
+      <button type="button">Eliminar</button>
+
+    </form>
+  );
+};
+
+export default IngredientForm;
