@@ -10,6 +10,7 @@ import Footer from './components/Layout/Footer';
 import Recipes from './pages/recipes/Recipes';
 import RecipeDetail from './pages/recipes/RecipeDetail';
 import RecipeCook from './pages/recipes/RecipeCook';
+import Inventory from './pages/Inventory/Inventory';
 
 // Componente para rutas protegidas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -83,6 +84,14 @@ const AppContent: React.FC = () => {
             element={
               <PrivateRoute>
                 <RecipeCook />
+              </PrivateRoute>
+            } 
+          />
+                    <Route 
+            path="/inventory" 
+            element={
+              <PrivateRoute>
+                <Inventory />
               </PrivateRoute>
             } 
           />
