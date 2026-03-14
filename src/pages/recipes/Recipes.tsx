@@ -91,7 +91,7 @@ const Recipes: React.FC = () => {
     setIsSearching(false);
     setSearchPerformed(false);
     try {
-      const response = await api.get('/recipes/suggested?limit=50');
+      const response = await api.get('/recipes/suggested?limit=20');
       setRecipes(response.data.data);
       setPagination({
         pagina_actual: 1,
