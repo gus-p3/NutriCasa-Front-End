@@ -26,6 +26,46 @@ interface SetupData {
   weeklyBudget: string;
 }
 
+// Calculadora nutricional
+const calculateNutrition = (
+  age: number,
+  weight: number,
+  height: number,
+  activityLevel: "low" | "medium" | "high",
+  goal: "lose" | "maintain" | "gain"
+) => {
+
+  const activityMultipliers = {
+    low: 1.2,
+    medium: 1.55,
+    high: 1.9
+  };
+
+  const goalAdjustment = {
+    lose: -300,
+    maintain: 0,
+    gain: 300
+  };
+
+  const bmr = 10 * weight + 6.25 * height - 5 * age;
+
+  const calories =
+    bmr * activityMultipliers[activityLevel] +
+    goalAdjustment[goal];
+
+  const proteinCalories = calories * 0.25;
+  const carbCalories = calories * 0.50;
+  const fatCalories = calories * 0.25;
+
+  return {
+    calories: Math.round(calories),
+    protein: Math.round(proteinCalories / 4),
+    carbs: Math.round(carbCalories / 4),
+    fat: Math.round(fatCalories / 9)
+  };
+};
+
+
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [showSetupModal, setShowSetupModal] = useState(true);
@@ -51,7 +91,17 @@ const Home: React.FC = () => {
 
   const progress = (currentStep / 6) * 100;
   const effectRan = useRef(false);
+
+  
+  const nutrition = calculateNutrition(
+  Number(setupData.age) || 0,
+  Number(setupData.weight) || 0,
+  Number(setupData.height) || 0,
+  setupData.activityLevel,
+  setupData.goal
+);
 useEffect(() => {
+
 
   if (effectRan.current) return;
   effectRan.current = true;
@@ -672,8 +722,9 @@ const handleNextStep = async () => {
                   <div className="flex justify-center">
                     <CalorieCircle 
                       consumed={dashboard.caloriesConsumed} 
-                      goal={dashboard.caloriesGoal} 
+                         goal={nutrition.calories} 
                     />
+
                   </div>
                 </div>
 
@@ -693,10 +744,10 @@ const handleNextStep = async () => {
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
                           <span className="text-sm font-medium text-gray-600">Proteínas</span>
-                          <span className="text-sm font-bold text-gray-800">{dashboard.macros?.protein}g</span>
+                          <span className="text-sm font-bold text-gray-800">{nutrition.protein}g</span>
                         </div>
                         <div className="w-full bg-gray-200 h-2 rounded-full">
-                          <div className="bg-red-500 h-2 rounded-full" style={{width: `${(dashboard.macros?.protein / 150) * 100}%`}}></div>
+                          <div className="bg-red-500 h-2 rounded-full" style={{width: `${(dashboard.macros?.protein / nutrition.protein) * 100}%`}}></div>
                         </div>
                       </div>
                     </div>
@@ -708,7 +759,7 @@ const handleNextStep = async () => {
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
                           <span className="text-sm font-medium text-gray-600">Carbohidratos</span>
-                          <span className="text-sm font-bold text-gray-800">{dashboard.macros?.carbs}g</span>
+                          <span className="text-sm font-bold text-gray-800">{nutrition.carbs}g</span>
                         </div>
                         <div className="w-full bg-gray-200 h-2 rounded-full">
                           <div className="bg-yellow-500 h-2 rounded-full" style={{width: `${(dashboard.macros?.carbs / 250) * 100}%`}}></div>
@@ -723,7 +774,8 @@ const handleNextStep = async () => {
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
                           <span className="text-sm font-medium text-gray-600">Grasas</span>
-                          <span className="text-sm font-bold text-gray-800">{dashboard.macros?.fat}g</span>
+                          <span className="text-sm font-bold text-gray-800">{nutrition.fat}g</span>
+
                         </div>
                         <div className="w-full bg-gray-200 h-2 rounded-full">
                           <div className="bg-green-500 h-2 rounded-full" style={{width: `${(dashboard.macros?.fat / 70) * 100}%`}}></div>
