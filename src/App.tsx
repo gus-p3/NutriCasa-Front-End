@@ -13,6 +13,8 @@ import RecipeDetail from './pages/recipes/RecipeDetail';
 import RecipeCook from './pages/recipes/RecipeCook';
 import Inventory from './pages/Inventory/Inventory';
 
+
+function App() {
 // Componente para rutas protegidas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
