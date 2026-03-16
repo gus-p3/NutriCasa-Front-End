@@ -12,7 +12,6 @@ import {
   ChevronDown,
   Sparkles,
   AlertCircle,
-  TrendingUp,
   Loader2,
   ArrowLeft
 } from 'lucide-react';
