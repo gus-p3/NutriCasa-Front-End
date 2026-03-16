@@ -3,6 +3,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  role: 'user' | 'admin';
   profile: {
     age?: number | null;
     weight?: number | null;
@@ -34,7 +35,7 @@ export interface RegisterData {
 
 export interface AuthResponse {
   message: string;
-  token: string;
+  token: string;   // short-lived access token (15 min)
   user: User;
 }
 

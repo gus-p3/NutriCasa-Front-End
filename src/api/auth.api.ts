@@ -1,47 +1,28 @@
 // src/api/auth.api.ts
 import axios, { type AxiosInstance, AxiosError } from 'axios';
 import type { LoginCredentials, RegisterData, AuthResponse, User, ApiError } from '../types';
+import { setAccessToken } from './api';
 
-
-const API_URL = import.meta.env.VITE_API_URL 
+const API_URL = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/auth`
   : 'http://localhost:3000/api/auth';
 
-console.log('🔧 API_URL final:', API_URL);
-
-// ... resto del código
-// Configuración base de axios
-const api: AxiosInstance = axios.create({
+// Separate axios instance for auth (no interceptors to avoid loops)
+const authAxios: AxiosInstance = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  withCredentials: true,            // send/receive the httpOnly refresh cookie
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Interceptor para agregar token a las peticiones
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Servicios de autenticación
 export const authApi = {
-  // Registro de usuario
+
+  // ── Register ────────────────────────────────────────────────────────────────
   register: async (userData: RegisterData): Promise<AuthResponse> => {
     try {
-      const response = await api.post<AuthResponse>('/register', userData);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
+      const response = await authAxios.post<AuthResponse>('/register', userData);
+      const { token, user } = response.data;
+      setAccessToken(token);                       // store access token in memory
+      localStorage.setItem('user', JSON.stringify(user));
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;
@@ -49,14 +30,13 @@ export const authApi = {
     }
   },
 
-  // Login de usuario
+  // ── Login ────────────────────────────────────────────────────────────────────
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
-      const response = await api.post<AuthResponse>('/login', credentials);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
+      const response = await authAxios.post<AuthResponse>('/login', credentials);
+      const { token, user } = response.data;
+      setAccessToken(token);                       // store access token in memory
+      localStorage.setItem('user', JSON.stringify(user));
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;
@@ -64,10 +44,27 @@ export const authApi = {
     }
   },
 
-  // Obtener perfil del usuario
+  // ── Silent refresh (called on app mount) ────────────────────────────────────
+  // Uses the httpOnly refresh cookie to get a fresh access token.
+  // Returns the user object if successful, null if not authenticated.
+  silentRefresh: async (): Promise<AuthResponse | null> => {
+    try {
+      const response = await authAxios.post<AuthResponse>('/refresh');
+      const { token, user } = response.data;
+      setAccessToken(token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return response.data;
+    } catch {
+      setAccessToken(null);
+      localStorage.removeItem('user');
+      return null;
+    }
+  },
+
+  // ── Get profile ──────────────────────────────────────────────────────────────
   getProfile: async (): Promise<{ user: User }> => {
     try {
-      const response = await api.get<{ user: User }>('/me');
+      const response = await authAxios.get<{ user: User }>('/me');
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;
@@ -75,10 +72,10 @@ export const authApi = {
     }
   },
 
-  // Actualizar perfil
+  // ── Update profile ───────────────────────────────────────────────────────────
   updateProfile: async (profileData: Partial<User>): Promise<{ message: string; user: User }> => {
     try {
-      const response = await api.put<{ message: string; user: User }>('/me', profileData);
+      const response = await authAxios.put<{ message: string; user: User }>('/me', profileData);
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;
@@ -86,10 +83,10 @@ export const authApi = {
     }
   },
 
-  // Configurar perfil nutricional (setup)
+  // ── Setup nutritional profile ────────────────────────────────────────────────
   setupProfile: async (setupData: any): Promise<any> => {
     try {
-      const response = await api.put('/me/profile', setupData);
+      const response = await authAxios.put('/me/profile', setupData);
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;
@@ -97,20 +94,24 @@ export const authApi = {
     }
   },
 
-  // Cerrar sesión
-  logout: (): void => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  // ── Logout ───────────────────────────────────────────────────────────────────
+  // Clears the httpOnly cookie server-side + clears client state.
+  logout: async (): Promise<void> => {
+    try {
+      await authAxios.post('/logout');
+    } catch {
+      /* proceed with client-side cleanup even if server fails */
+    } finally {
+      setAccessToken(null);
+      localStorage.removeItem('user');
+    }
   },
 
-  // Verificar si el usuario está autenticado
-  isAuthenticated: (): boolean => {
-    return !!localStorage.getItem('token');
-  },
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+  isAuthenticated: (): boolean => !!localStorage.getItem('user'),
 
-  // Obtener usuario del localStorage
   getCurrentUser: (): User | null => {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
-  }
+  },
 };
