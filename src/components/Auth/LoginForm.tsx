@@ -39,7 +39,7 @@ const LoginForm: React.FC = () => {
       const hasCompleteProfile = user.profile?.age && user.profile?.weight && user.profile?.height;
       
       if (hasCompleteProfile) {
-        navigate('/dashboard');
+        navigate('/home');
       } else {
         navigate('/setup');
       }
