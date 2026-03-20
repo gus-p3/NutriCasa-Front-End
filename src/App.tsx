@@ -17,19 +17,17 @@ import RecipeCook from './pages/recipes/RecipeCook';
 import History from './pages/profile/History';
 import Inventory from './pages/Inventory/Inventory';
 
-
 function App() {
 
-  // Rutas protegidas
+  // 🔐 (DESACTIVADO TEMPORALMENTE)
   const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { isAuthenticated } = useAuth();
-    return isAuthenticated() ? <>{children}</> : <Navigate to="/login" />;
+    return <>{children}</>;
   };
 
-  // Rutas públicas
+  // 🌐 Rutas públicas
   const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isAuthenticated } = useAuth();
-    return !isAuthenticated() ? <>{children}</> : <Navigate to="/dashboard" />;
+    return !isAuthenticated() ? <>{children}</> : <Navigate to="/inicio" />;
   };
 
   const AppContent: React.FC = () => {
@@ -40,93 +38,37 @@ function App() {
         <main className="flex-grow">
           <Routes>
 
+            {/* 🟢 RUTA FORZADA PARA PROBAR HISTORY */}
+            <Route path="/history" element={<History />} />
+
+            {/* Públicas */}
             <Route path="/" element={<Home />} />
 
-            <Route
-              path="/login"
-              element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              }
-            />
+            <Route path="/login" element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } />
 
-            <Route
-              path="/register"
-              element={
-                <PublicRoute>
-                  <Register />
-                </PublicRoute>
-              }
-            />
+            <Route path="/register" element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            } />
 
-            {/* Rutas privadas */}
+            {/* Privadas (pero sin protección por ahora) */}
+            <Route path="/inicio" element={<Inicio />} />
 
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <div className="container mx-auto px-4 py-8">
-                    <h1 className="text-3xl font-bold">Dashboard</h1>
-                    <p className="text-gray-600 mt-4">
-                      ¡Bienvenido a tu espacio personal!
-                    </p>
-                  </div>
-                </PrivateRoute>
-              }
-            />
+            <Route path="/recipes" element={<Recipes />} />
 
-            <Route
-              path="/setup"
-              element={
-                <PrivateRoute>
-                  <div className="container mx-auto px-4 py-8">
-                    <h1 className="text-3xl font-bold">Configura tu perfil</h1>
-                    <p className="text-gray-600 mt-4">
-                      Aquí irá el asistente de configuración de 6 pasos
-                    </p>
-                  </div>
-                </PrivateRoute>
-              }
-            />
+            <Route path="/recipes/:id" element={<RecipeDetail />} />
 
-            {/* Rutas de recetas */}
+            <Route path="/recipes/:id/cook" element={<RecipeCook />} />
 
-            <Route
-              path="/recipes"
-              element={
-                <PrivateRoute>
-                  <Recipes />
-                </PrivateRoute>
-              }
-            />
+            <Route path="/inventory" element={<Inventory />} />
 
-            <Route
-  path="/history"
-  element={
-    <PrivateRoute>
-      <History />
-    </PrivateRoute>
-  }
-/>
-
-            <Route
-              path="/recipes/:id"
-              element={
-                <PrivateRoute>
-                  <RecipeDetail />
-                </PrivateRoute>
-              }
-            />
-
-            <Route
-              path="/recipes/:id/cook"
-              element={
-                <PrivateRoute>
-                  <RecipeCook />
-                </PrivateRoute>
-              }
-            />
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" />} />
 
           </Routes>
         </main>
@@ -135,96 +77,6 @@ function App() {
       </div>
     );
   };
-// Componente para redirigir si ya está autenticado
-const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  // Redirige a /inicio cuando ya está autenticado
-  return !isAuthenticated() ? <>{children}</> : <Navigate to="/inicio" />;
-};
-
-const AppContent: React.FC = () => {
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="flex-grow">
-        <Routes>
-          {/* Ruta pública principal */}
-          <Route path="/" element={<Home />} />
-
-          {/* Login / Register */}
-          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-
-          {/* Pantalla de inicio luego de autenticarse */}
-          <Route path="/inicio" element={
-            <PrivateRoute>
-              <Inicio />
-            </PrivateRoute>
-          } />
-
-          {/* Rutas privadas adicionales */}
-          <Route path="/setup" element={
-            <PrivateRoute>
-              <div className="container mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold">Configura tu perfil</h1>
-                <p className="text-gray-600 mt-4">
-                  Aquí irá el asistente de configuración de 6 pasos
-                </p>
-              </div>
-            </PrivateRoute>
-          } />
-
-          <Route path="/recipes" element={
-            <PrivateRoute><Recipes /></PrivateRoute>
-          } />
-          <Route path="/recipes/:id" element={
-            <PrivateRoute><RecipeDetail /></PrivateRoute>
-          } />
-          <Route path="/recipes/:id/cook" element={
-            <PrivateRoute><RecipeCook /></PrivateRoute>
-          } />
-
-          {/* Ruta por defecto si no encuentra la página */}
-          <Route path="*" element={<Navigate to="/" />} />
-          {/* Nuevas rutas de recetas */}
-          <Route 
-            path="/recipes" 
-            element={
-              <PrivateRoute>
-                <Recipes />
-              </PrivateRoute>
-            } 
-          />
-          <Route 
-            path="/recipes/:id" 
-            element={
-              <PrivateRoute>
-                <RecipeDetail />
-              </PrivateRoute>
-            } 
-          />
-          <Route 
-            path="/recipes/:id/cook" 
-            element={
-              <PrivateRoute>
-                <RecipeCook />
-              </PrivateRoute>
-            } 
-          />
-                    <Route 
-            path="/inventory" 
-            element={
-              <PrivateRoute>
-                <Inventory />
-              </PrivateRoute>
-            } 
-          />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
-  );
-};
 
   return (
     <Router>

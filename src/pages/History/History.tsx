@@ -1,40 +1,36 @@
-import { useEffect, useState } from 'react';
-import api from '../../api/api';
+import React from "react";
 
-interface HistoryItem {
-  id: number;
-  recipeName: string;
-  date: string;
-  rating: number;
-}
-
-export default function History() {
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const response = await api.get('/history');
-        setHistory(response.data);
-      } catch (error) {
-        console.error('Error fetching history:', error);
-      }
-    };
-
-    fetchHistory();
-  }, []);
+const History: React.FC = () => {
+  const historyData = [
+    {
+      id: 1,
+      name: "Ensalada saludable",
+      date: "2026-03-17",
+    },
+    {
+      id: 2,
+      name: "Pollo a la plancha",
+      date: "2026-03-16",
+    },
+  ];
 
   return (
-    <div>
-      <h1>Historial</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Historial</h1>
 
-      {history.map((item) => (
-        <div key={item.id}>
-          <h2>{item.recipeName}</h2>
-          <p>{item.date}</p>
-          <p>Rating: {item.rating}</p>
-        </div>
-      ))}
+      <div className="space-y-4">
+        {historyData.map((item) => (
+          <div
+            key={item.id}
+            className="border rounded-lg p-4 shadow-sm"
+          >
+            <h2 className="text-xl font-semibold">{item.name}</h2>
+            <p className="text-gray-600">{item.date}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+};
+
+export default History;
