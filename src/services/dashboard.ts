@@ -1,17 +1,7 @@
-import axios from "axios";
+// services/dashboard.ts
+import api from './api';
 
 export const getDashboard = async () => {
-
-  const email = localStorage.getItem("email");
-
-  const res = await axios.get("/api/dashboard", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    },
-    params: {
-      email: email
-    }
-  });
-
+  const res = await api.get('/dashboard');
   return res.data;
 };

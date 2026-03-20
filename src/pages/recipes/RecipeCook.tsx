@@ -41,7 +41,7 @@ const RecipeCook: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (timerActive && timerSecondsLeft > 0) {
       interval = setInterval(() => {
         setTimerSecondsLeft(prev => prev - 1);

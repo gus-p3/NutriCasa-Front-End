@@ -17,67 +17,88 @@ import RecipeCook from './pages/recipes/RecipeCook';
 import History from './pages/profile/History';
 import Inventory from './pages/Inventory/Inventory';
 
-function App() {
+// 🔐 Rutas privadas
+const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated() ? <>{children}</> : <Navigate to="/login" />;
+};
 
-  // 🔐 (DESACTIVADO TEMPORALMENTE)
-  const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    return <>{children}</>;
-  };
+// 🌐 Rutas públicas
+const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return !isAuthenticated() ? <>{children}</> : <Navigate to="/inicio" />;
+};
 
-  // 🌐 Rutas públicas
-  const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { isAuthenticated } = useAuth();
-    return !isAuthenticated() ? <>{children}</> : <Navigate to="/inicio" />;
-  };
+const AppContent: React.FC = () => {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
 
-  const AppContent: React.FC = () => {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
+      <main className="flex-grow">
+        <Routes>
 
-        <main className="flex-grow">
-          <Routes>
+          {/* 🟢 Ruta temporal para probar History */}
+          <Route path="/history" element={<History />} />
 
-            {/* 🟢 RUTA FORZADA PARA PROBAR HISTORY */}
-            <Route path="/history" element={<History />} />
+          {/* Públicas */}
+          <Route path="/" element={<Home />} />
 
-            {/* Públicas */}
-            <Route path="/" element={<Home />} />
+          <Route path="/login" element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          } />
 
-            <Route path="/login" element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            } />
+          <Route path="/register" element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          } />
 
-            <Route path="/register" element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
-            } />
+          {/* Privadas */}
+          <Route path="/inicio" element={
+            <PrivateRoute>
+              <Inicio />
+            </PrivateRoute>
+          } />
 
-            {/* Privadas (pero sin protección por ahora) */}
-            <Route path="/inicio" element={<Inicio />} />
+          <Route path="/recipes" element={
+            <PrivateRoute>
+              <Recipes />
+            </PrivateRoute>
+          } />
 
-            <Route path="/recipes" element={<Recipes />} />
+          <Route path="/recipes/:id" element={
+            <PrivateRoute>
+              <RecipeDetail />
+            </PrivateRoute>
+          } />
 
-            <Route path="/recipes/:id" element={<RecipeDetail />} />
+          <Route path="/recipes/:id/cook" element={
+            <PrivateRoute>
+              <RecipeCook />
+            </PrivateRoute>
+          } />
 
-            <Route path="/recipes/:id/cook" element={<RecipeCook />} />
+          <Route path="/inventory" element={
+            <PrivateRoute>
+              <Inventory />
+            </PrivateRoute>
+          } />
 
-            <Route path="/inventory" element={<Inventory />} />
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" />} />
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </main>
 
-          </Routes>
-        </main>
+      <Footer />
+    </div>
+  );
+};
 
-        <Footer />
-      </div>
-    );
-  };
-
+// 🚀 App principal
+const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
@@ -85,6 +106,6 @@ function App() {
       </AuthProvider>
     </Router>
   );
-}
+};
 
 export default App;

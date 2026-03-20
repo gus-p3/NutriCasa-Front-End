@@ -8,62 +8,75 @@ interface AuthContextType {
   loading: boolean;
   login: (credentials: LoginCredentials) => Promise<any>;
   register: (userData: RegisterData) => Promise<any>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: () => boolean;
+  isAdmin: () => boolean;
+  role: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe usarse dentro de AuthProvider');
-  }
+  if (!context) throw new Error('useAuth debe usarse dentro de AuthProvider');
   return context;
 };
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
+  // ── On mount: try silent refresh using the httpOnly cookie ─────────────────
+  // This restores the session after a page reload without showing a login screen.
   useEffect(() => {
-    // Cargar usuario del localStorage al iniciar
-    const currentUser = authApi.getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
-    }
-    setLoading(false);
+    const restoreSession = async () => {
+      // Fast path: if we have a cached user in localStorage, hydrate state immediately
+      const cached = authApi.getCurrentUser();
+      if (cached) setUser(cached);
+
+      // Then silently refresh to get a fresh access token and up-to-date user info
+      const result = await authApi.silentRefresh();
+      if (result) {
+        setUser(result.user);
+      } else {
+        // Refresh cookie expired or invalid — user must log in
+        setUser(null);
+      }
+      setLoading(false);
+    };
+
+    restoreSession();
   }, []);
 
-  const login = async (credentials: LoginCredentials): Promise<any> => {
+  const login = async (credentials: LoginCredentials) => {
     const response = await authApi.login(credentials);
     setUser(response.user);
     return response;
   };
 
-  const register = async (userData: RegisterData): Promise<any> => {
+  const register = async (userData: RegisterData) => {
     const response = await authApi.register(userData);
     setUser(response.user);
     return response;
   };
 
-  const logout = (): void => {
-    authApi.logout();
+  const logout = async () => {
+    await authApi.logout();   // clears httpOnly cookie on server
     setUser(null);
   };
 
-  const value: AuthContextType = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    isAuthenticated: authApi.isAuthenticated
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{
+      user,
+      loading,
+      login,
+      register,
+      logout,
+      isAuthenticated: () => !!user,
+      isAdmin: () => user?.role === 'admin',
+      role: user?.role ?? null,
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
