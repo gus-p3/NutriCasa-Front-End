@@ -1,0 +1,57 @@
+import HistoryDetailModal from './components/HistoryDetailModal';
+
+import React, { useState } from 'react';
+
+const History = () => {
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<any>(null);
+
+  const fakeData = [
+    {
+      _id: "1",
+      recipeName: "Tacos",
+      cookedAt: new Date().toISOString(),
+      rating: 4,
+      estimatedCost: 100,
+      caloriesConsumed: 500,
+      mealTime: "comida",
+      ingredientsUsed: [
+        { name: "Tortilla", quantityUsed: 2, unit: "pz", leftover: 0 },
+        { name: "Carne", quantityUsed: 200, unit: "g", leftover: 50 }
+      ],
+      recipeId: "123"
+    }
+  ];
+
+  return (
+    <div>
+      <h1>Historial</h1>
+
+      {fakeData.map((item) => (
+        <div
+          key={item._id}
+          onClick={() => {
+            setSelectedEntry(item);
+            setModalOpen(true);
+          }}
+          style={{ border: "1px solid black", padding: "10px", margin: "10px", cursor: "pointer" }}
+        >
+          {item.recipeName}
+        </div>
+      ))}
+
+      {modalOpen && selectedEntry && (
+        <HistoryDetailModal
+          entry={selectedEntry}
+          onClose={() => {
+            setModalOpen(false);
+            setSelectedEntry(null);
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default History;

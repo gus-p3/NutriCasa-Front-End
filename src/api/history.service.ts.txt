@@ -1,0 +1,83 @@
+import api from './api'; 
+
+// ============================================ 
+// SERVICIO DE HISTORIAL 
+// ============================================ 
+
+export interface IngredientUsed { 
+  name: string; 
+  quantityUsed: number; 
+  unit: string; 
+  leftover: number; 
+} 
+
+export interface HistoryEntry { 
+  _id: string; 
+  recipeId: string | { 
+    _id: string; 
+    title: string; 
+    imageUrl: string; 
+    category: string; 
+    difficulty: string; 
+  }; 
+  recipeName: string; 
+  cookedAt: string; 
+  rating: number; 
+  ingredientsUsed: IngredientUsed[]; 
+  estimatedCost: number; 
+  caloriesConsumed: number; 
+  mealTime: 'desayuno' | 'comida' | 'cena' | 'snack'; 
+  createdAt: string; 
+} 
+
+export interface HistoryResponse { 
+  success: boolean; 
+  data: HistoryEntry[]; 
+} 
+
+/** 
+ * Obtiene todo el historial del usuario 
+ */ 
+export const getUserHistory = async (): Promise<HistoryEntry[]> => { 
+  try { 
+    const response = await api.get<HistoryResponse>('/history'); 
+    return response.data.data; 
+  } catch (error) { 
+    console.error('Error en history.service - getUserHistory:', error); 
+    throw error; 
+  } 
+}; 
+
+/** 
+ * Obtiene una entrada específica del historial por ID 
+ */ 
+export const getHistoryEntryById = async (entryId: string): Promise<HistoryEntry> => { 
+  try { 
+    const response = await api.get<{ success: boolean; data: HistoryEntry }>(`/history/${entryId}`); 
+    return response.data.data; 
+  } catch (error) { 
+    console.error('Error en history.service - getHistoryEntryById:', error); 
+    throw error; 
+  } 
+}; 
+
+/** 
+ * Formatea una fecha para mostrar en UI 
+ */ 
+export const formatHistoryDate = (dateString: string): string => { 
+  const date = new Date(dateString); 
+  return date.toLocaleDateString('es-MX', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  }); 
+}; 
+
+/** 
+ * Calcula el total de ingredientes con sobrantes 
+ */ 
+export const countLeftoverIngredients = (ingredients: IngredientUsed[]): number => { 
+  return ingredients.filter(ing => ing.leftover > 0).length; 
+};

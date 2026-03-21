@@ -1,0 +1,256 @@
+
+import React, { useState } from 'react'; 
+
+import {  
+  X,  
+  Star,  
+  Calendar,  
+  DollarSign,  
+  Flame,  
+  Clock,  
+  Package,  
+  ChefHat, 
+  ArrowLeft, 
+  CheckCircle, 
+  AlertCircle, 
+  RefreshCw 
+} from 'lucide-react'; 
+
+import { HistoryEntry, formatHistoryDate, countLeftoverIngredients } from '../../../api/history.service'; 
+
+// ============================================ 
+// INTERFAZ DE PROPS 
+// ============================================ 
+
+interface HistoryDetailModalProps { 
+  entry: HistoryEntry; 
+  onClose: () => void; 
+  onRefresh?: () => void; 
+} 
+
+// ============================================ 
+// COMPONENTE MODAL DE DETALLE 
+// ============================================ 
+
+const HistoryDetailModal: React.FC<HistoryDetailModalProps> = ({  
+  entry,  
+  onClose,
+  onRefresh 
+}) => { 
+
+  const [isClosing, setIsClosing] = useState(false); 
+
+  const handleClose = () => { 
+    setIsClosing(true); 
+    setTimeout(() => { 
+      onClose(); 
+    }, 200); 
+  }; 
+
+  const getMealTimeStyle = (mealTime: string) => { 
+    switch (mealTime) { 
+      case 'desayuno': 
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200'; 
+      case 'comida': 
+        return 'bg-green-100 text-green-700 border-green-200'; 
+      case 'cena': 
+        return 'bg-indigo-100 text-indigo-700 border-indigo-200'; 
+      case 'snack': 
+        return 'bg-purple-100 text-purple-700 border-purple-200'; 
+      default: 
+        return 'bg-gray-100 text-gray-700 border-gray-200'; 
+    } 
+  }; 
+
+  const renderStars = (rating: number) => { 
+    return ( 
+      <div className="flex items-center gap-1"> 
+        {[1, 2, 3, 4, 5].map((star) => ( 
+          <Star 
+            key={star} 
+            size={20} 
+            className={star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'} 
+          /> 
+        ))} 
+        <span className="ml-2 text-sm text-gray-500">({rating}/5)</span> 
+      </div> 
+    ); 
+  }; 
+
+  const getRecipeImage = () => { 
+    if (typeof entry.recipeId === 'object' && entry.recipeId.imageUrl) { 
+      return entry.recipeId.imageUrl; 
+    } 
+    return null; 
+  }; 
+
+  const getRecipeCategory = () => { 
+    if (typeof entry.recipeId === 'object' && entry.recipeId.category) { 
+      return entry.recipeId.category; 
+    } 
+    return entry.mealTime; 
+  }; 
+
+  return ( 
+    <> 
+      <div  
+        className={`fixed inset-0 bg-black transition-opacity duration-200 ${ 
+          isClosing ? 'opacity-0' : 'opacity-50' 
+        }`} 
+        onClick={handleClose} 
+      /> 
+       
+      <div  
+        className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-200 ${ 
+          isClosing ? 'opacity-0 scale-95' : 'opacity-100 scale-100' 
+        }`} 
+      > 
+
+        <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"> 
+           
+          <div className="relative h-48 bg-gradient-to-r from-green-500 to-green-600"> 
+            {getRecipeImage() ? ( 
+              <img  
+                src={getRecipeImage()!}  
+                alt={entry.recipeName} 
+                className="w-full h-full object-cover" 
+              /> 
+            ) : ( 
+              <div className="w-full h-full flex items-center justify-center"> 
+                <ChefHat size={64} className="text-white opacity-50" /> 
+              </div> 
+            )} 
+             
+            <button 
+              onClick={handleClose} 
+              className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm p-2 rounded-full hover:bg-white/30 transition-colors" 
+            > 
+              <X size={24} className="text-white" /> 
+            </button> 
+             
+            <div className={`absolute bottom-4 left-4 px-4 py-2 rounded-full text-sm font-medium border ${getMealTimeStyle(entry.mealTime)}`}> 
+              {entry.mealTime} 
+            </div> 
+          </div> 
+
+          <div className="p-6"> 
+             
+            <div className="flex justify-between items-start mb-4"> 
+              <h2 className="text-2xl font-bold text-gray-900">{entry.recipeName}</h2> 
+              {renderStars(entry.rating)} 
+            </div> 
+
+            <div className="flex items-center gap-2 text-gray-600 mb-6"> 
+              <Calendar size={18} /> 
+              <span>{formatHistoryDate(entry.cookedAt)}</span> 
+            </div> 
+
+            <div className="grid grid-cols-3 gap-4 mb-6"> 
+              <div className="bg-gray-50 rounded-xl p-3 text-center"> 
+                <Flame className="text-green-600 mx-auto mb-1" size={24} /> 
+                <p className="text-xs text-gray-500">Calorías</p> 
+                <p className="text-lg font-bold text-gray-900">{entry.caloriesConsumed}</p> 
+              </div> 
+              <div className="bg-gray-50 rounded-xl p-3 text-center"> 
+                <DollarSign className="text-green-600 mx-auto mb-1" size={24} /> 
+                <p className="text-xs text-gray-500">Costo</p> 
+                <p className="text-lg font-bold text-gray-900">${entry.estimatedCost}</p> 
+              </div> 
+              <div className="bg-gray-50 rounded-xl p-3 text-center"> 
+                <Package className="text-green-600 mx-auto mb-1" size={24} /> 
+                <p className="text-xs text-gray-500">Ingredientes</p> 
+                <p className="text-lg font-bold text-gray-900">{entry.ingredientsUsed.length}</p> 
+              </div> 
+            </div> 
+
+            <div className="mb-6"> 
+              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2"> 
+                <Package size={20} className="text-green-600" /> 
+                Ingredientes utilizados 
+              </h3> 
+               
+              <div className="space-y-3"> 
+                {entry.ingredientsUsed.map((ingredient, index) => ( 
+                  <div  
+                    key={index} 
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100" 
+                  > 
+                    <div className="flex items-center gap-3"> 
+                      {ingredient.leftover > 0 ? ( 
+                        <AlertCircle size={18} className="text-yellow-500" /> 
+                      ) : ( 
+                        <CheckCircle size={18} className="text-green-500" /> 
+                      )} 
+                      <span className="font-medium text-gray-800">{ingredient.name}</span> 
+                    </div> 
+                    <div className="text-sm"> 
+                      <span className="text-gray-600"> 
+                        {ingredient.quantityUsed} {ingredient.unit} 
+                      </span> 
+                      {ingredient.leftover > 0 && ( 
+                        <span className="ml-2 text-yellow-600 text-xs bg-yellow-50 px-2 py-1 rounded-full"> 
+                          {ingredient.leftover} {ingredient.unit} sobrante 
+                        </span> 
+                      )} 
+                    </div> 
+                  </div> 
+                ))} 
+              </div> 
+            </div> 
+
+            <div className="bg-green-50 rounded-xl p-4 mb-6"> 
+              <h4 className="font-medium text-green-800 mb-2">Resumen de la receta</h4> 
+              <div className="grid grid-cols-2 gap-2 text-sm"> 
+                <div> 
+                  <span className="text-green-700">Ingredientes totales:</span> 
+                  <span className="ml-2 font-medium text-green-900">{entry.ingredientsUsed.length}</span> 
+                </div> 
+                <div> 
+                  <span className="text-green-700">Con sobrantes:</span> 
+                  <span className="ml-2 font-medium text-green-900"> 
+                    {countLeftoverIngredients(entry.ingredientsUsed)} 
+                  </span> 
+                </div> 
+                <div> 
+                  <span className="text-green-700">Costo por ingrediente:</span> 
+                  <span className="ml-2 font-medium text-green-900"> 
+                    ${(entry.estimatedCost / entry.ingredientsUsed.length).toFixed(2)} 
+                  </span> 
+                </div> 
+                <div> 
+                  <span className="text-green-700">Calorías por ing.:</span> 
+                  <span className="ml-2 font-medium text-green-900"> 
+                    {Math.round(entry.caloriesConsumed / entry.ingredientsUsed.length)} 
+                  </span> 
+                </div> 
+              </div> 
+            </div> 
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100"> 
+              <button 
+                onClick={handleClose} 
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 flex items-center gap-2" 
+              > 
+                <ArrowLeft size={18} /> 
+                Cerrar 
+              </button> 
+               
+              <button 
+                onClick={() => { 
+                  window.location.href = `/recipes/${typeof entry.recipeId === 'object' ? entry.recipeId._id : entry.recipeId}`; 
+                }} 
+                className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 flex items-center gap-2" 
+              > 
+                <RefreshCw size={18} /> 
+                Cocinar de nuevo 
+              </button> 
+            </div> 
+
+          </div> 
+        </div> 
+      </div> 
+    </> 
+  ); 
+}; 
+
+export default HistoryDetailModal;
