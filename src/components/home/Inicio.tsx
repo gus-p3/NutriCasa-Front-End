@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   ChefHat, Target, Activity, X, CheckCircle, Plus, 
   TrendingUp, Flame, Droplets, UtensilsCrossed, 
-  Apple, Beef, Wheat, Salad, Calendar, DollarSign,
+  Beef, Wheat, Calendar, DollarSign,
   Zap, Award, ArrowRight, Settings, Sparkles,
   Sun, Moon, Sunrise, Clock
 } from 'lucide-react';
@@ -156,15 +156,6 @@ useEffect(() => {
   init(); // 👈 MUY IMPORTANTE
 
 }, []);
-
-  const loadDashboard = async () => {
-    try {
-      const data = await getDashboard();
-      setDashboard(data);
-    } catch (err) {
-      console.error("Error dashboard", err);
-    }
-  };
 
  // Círculo de calorías mejorado
 const CalorieCircle = ({ consumed, goal }: { consumed: number; goal: number }) => {
@@ -588,7 +579,6 @@ const handleNextStep = async () => {
  const loadSuggestedRecipes = async () => {
   try {
 
-    const email = localStorage.getItem("email");
    const data = await getSuggestedRecipes();
     setRecipes(data);
 
@@ -691,13 +681,15 @@ const handleNextStep = async () => {
               <h2 className="text-3xl font-bold">Tu viaje saludable comienza aquí</h2>
             </div>
             <p className="text-xl mb-6 opacity-90">Descubre recetas personalizadas y alcanza tus objetivos con nuestra ayuda</p>
-            <button 
-              onClick={() => { navigate('/recipes'); loadSuggestedRecipes(); }} 
-              className="group bg-white text-green-600 px-8 py-3 rounded-xl font-semibold hover:bg-green-50 transition shadow-lg flex items-center gap-2"
-            >
-              Explorar recetas
-              <ArrowRight className="group-hover:translate-x-1 transition" size={20} />
-            </button>
+            <div className="flex flex-wrap gap-4">
+              <button 
+                onClick={() => { navigate('/recipes'); loadSuggestedRecipes(); }} 
+                className="group bg-white text-green-600 px-8 py-3 rounded-xl font-semibold hover:bg-green-50 transition shadow-lg flex items-center gap-2"
+              >
+                Explorar recetas
+                <ArrowRight className="group-hover:translate-x-1 transition" size={20} />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -905,7 +897,7 @@ const handleNextStep = async () => {
               Recetas sugeridas para ti
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {recipes.map((r, index) => (
+              {recipes.map((r) => (
                 <div 
                   key={r.id} 
                   className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition cursor-pointer"

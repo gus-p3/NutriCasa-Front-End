@@ -12,7 +12,6 @@ import {
   ChevronDown,
   Sparkles,
   AlertCircle,
-  TrendingUp,
   Loader2,
   ArrowLeft
 } from 'lucide-react';
@@ -570,6 +569,17 @@ const Recipes: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* Botón Flotante de IA */}
+      <Link 
+        to="/ai-dashboard"
+        className="fixed bottom-8 right-8 bg-gradient-to-r from-green-500 to-emerald-500 text-white p-4 rounded-full shadow-2xl hover:shadow-green-500/30 hover:scale-110 transition-all duration-300 z-50 flex items-center justify-center group flex-nowrap"
+      >
+        <Sparkles size={28} className="group-hover:animate-spin" />
+        <span className="w-0 overflow-hidden group-hover:w-auto group-hover:ml-2 transition-all duration-300 whitespace-nowrap font-bold opacity-0 group-hover:opacity-100">
+          Chef IA
+        </span>
+      </Link>
     </div>
   );
 };
