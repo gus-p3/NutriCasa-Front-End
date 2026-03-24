@@ -1,5 +1,5 @@
 // src/context/AuthContext.tsx
-import React, { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef, type ReactNode } from 'react';
 import { authApi } from '../api/auth.api';
 import type { User, LoginCredentials, RegisterData } from '../types';
 
@@ -26,9 +26,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const initialized = useRef(false);
+
   // ── On mount: try silent refresh using the httpOnly cookie ─────────────────
   // This restores the session after a page reload without showing a login screen.
+  // Ref helps prevent strict-mode double invocation which ruins refresh token rotation.
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
     const restoreSession = async () => {
       // Fast path: if we have a cached user in localStorage, hydrate state immediately
       const cached = authApi.getCurrentUser();

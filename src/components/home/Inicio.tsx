@@ -681,13 +681,15 @@ const handleNextStep = async () => {
               <h2 className="text-3xl font-bold">Tu viaje saludable comienza aquí</h2>
             </div>
             <p className="text-xl mb-6 opacity-90">Descubre recetas personalizadas y alcanza tus objetivos con nuestra ayuda</p>
-            <button 
-              onClick={() => { navigate('/recipes'); loadSuggestedRecipes(); }} 
-              className="group bg-white text-green-600 px-8 py-3 rounded-xl font-semibold hover:bg-green-50 transition shadow-lg flex items-center gap-2"
-            >
-              Explorar recetas
-              <ArrowRight className="group-hover:translate-x-1 transition" size={20} />
-            </button>
+            <div className="flex flex-wrap gap-4">
+              <button 
+                onClick={() => { navigate('/recipes'); loadSuggestedRecipes(); }} 
+                className="group bg-white text-green-600 px-8 py-3 rounded-xl font-semibold hover:bg-green-50 transition shadow-lg flex items-center gap-2"
+              >
+                Explorar recetas
+                <ArrowRight className="group-hover:translate-x-1 transition" size={20} />
+              </button>
+            </div>
           </div>
         </div>
 

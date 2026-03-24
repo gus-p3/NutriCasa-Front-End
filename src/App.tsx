@@ -15,6 +15,7 @@ import Recipes from './pages/recipes/Recipes';
 import RecipeDetail from './pages/recipes/RecipeDetail';
 import RecipeCook from './pages/recipes/RecipeCook';
 import History from './pages/profile/History';
+import AiDashboard from './pages/AiDashboard';
 import Inventory from './pages/Inventory/Inventory';
 
 // 🔐 Rutas privadas
@@ -87,6 +88,65 @@ const AppContent: React.FC = () => {
           } />
 
           {/* Fallback */}
+          {/* Login / Register */}
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+
+          {/* Pantalla de inicio luego de autenticarse */}
+          <Route 
+            path="/inicio" 
+            element={
+              <PrivateRoute>
+                <Inicio />
+              </PrivateRoute>
+            } 
+          />
+          
+          <Route 
+            path="/recipes" 
+            element={
+              <PrivateRoute>
+                <Recipes />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/recipes/:id" 
+            element={
+              <PrivateRoute>
+                <RecipeDetail />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/recipes/:id/cook" 
+            element={
+              <PrivateRoute>
+                <RecipeCook />
+              </PrivateRoute>
+            } 
+          />
+          
+          <Route 
+            path="/ai-dashboard" 
+            element={
+              <PrivateRoute>
+                <AiDashboard />
+              </PrivateRoute>
+            } 
+          />
+
+          {/* Ruta de inventario */}
+          <Route 
+            path="/inventory" 
+            element={
+              <PrivateRoute>
+                <Inventory />
+              </PrivateRoute>
+            } 
+          />
+
+          {/* Ruta por defecto si no encuentra la página */}
           <Route path="*" element={<Navigate to="/" />} />
 
         </Routes>

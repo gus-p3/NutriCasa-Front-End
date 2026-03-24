@@ -215,7 +215,11 @@ const Inventory: React.FC = () => {
   };
 
   const handleAdd = async () => {
-    if (!formData.name.trim() || !formData.quantity) { setFormError('El nombre y la cantidad son obligatorios.'); return; }
+    const qty = Number(formData.quantity);
+    if (!formData.name.trim() || formData.quantity === '' || isNaN(qty) || qty < 0) { 
+      setFormError('El nombre es obligatorio y la cantidad debe ser un número válido >= 0.'); 
+      return; 
+    }
     setSaving(true); setFormError('');
     try {
       await api.post('/inventory', { name: formData.name.trim(), quantity: Number(formData.quantity), unit: formData.unit, category: formData.category, expiresAt: formData.expiresAt || undefined });
@@ -235,7 +239,11 @@ const Inventory: React.FC = () => {
 
   const handleEdit = async () => {
     if (!selectedItem) return;
-    if (!formData.name.trim() || !formData.quantity) { setFormError('El nombre y la cantidad son obligatorios.'); return; }
+    const qty = Number(formData.quantity);
+    if (!formData.name.trim() || formData.quantity === '' || isNaN(qty) || qty < 0) { 
+      setFormError('El nombre es obligatorio y la cantidad debe ser un número válido >= 0.'); 
+      return; 
+    }
     setSaving(true); setFormError('');
     try {
       await api.put(`/inventory/${selectedItem._id}`, { name: formData.name.trim(), quantity: Number(formData.quantity), unit: formData.unit, category: formData.category, expiresAt: formData.expiresAt || undefined });
@@ -533,7 +541,7 @@ const Inventory: React.FC = () => {
           {formError && <FormError msg={formError} />}
           <FormInput label="Nombre" placeholder="Ej: Pechuga de pollo" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
           <div className="grid grid-cols-2 gap-3">
-            <FormInput label="Cantidad" type="number" min="0" placeholder="0" value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} />
+            <FormInput label="Cantidad" type="number" step="any" min="0" placeholder="0" value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} />
             <FormSelect label="Unidad" value={formData.unit} onChange={e => setFormData({ ...formData, unit: e.target.value as Unit })}>
               {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
             </FormSelect>
@@ -552,7 +560,7 @@ const Inventory: React.FC = () => {
           {formError && <FormError msg={formError} />}
           <FormInput label="Nombre" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
           <div className="grid grid-cols-2 gap-3">
-            <FormInput label="Cantidad" type="number" min="0" value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} />
+            <FormInput label="Cantidad" type="number" step="any" min="0" value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} />
             <FormSelect label="Unidad" value={formData.unit} onChange={e => setFormData({ ...formData, unit: e.target.value as Unit })}>
               {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
             </FormSelect>
