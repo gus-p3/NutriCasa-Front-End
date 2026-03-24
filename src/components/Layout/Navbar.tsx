@@ -62,17 +62,11 @@ const Navbar: React.FC = () => {
                   Hola, {user?.name}
                 </span>
                 <Link 
-                  to="/inicio"
+                  to="/history" 
                   className="px-4 py-2 text-gray-600 hover:text-green-600 transition"
                 >
-                  Dashboard
+                  Historial
                 </Link>
-                <Link 
-  to="/history" 
-  className="px-4 py-2 text-gray-600 hover:text-green-600 transition"
->
-  Historial
-</Link>
                 {/* User badge */}
                 <div className="hidden md:flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-1.5 border border-gray-100">
                   <div className="w-7 h-7 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-xs">
