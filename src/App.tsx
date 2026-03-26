@@ -104,7 +104,7 @@ const AppContent: React.FC = () => {
         </Routes>
         {/*Cambio para ver el chatboot*/}
         {/* Renderiza el Chatbot en toda la plataforma si el usuario está logueado */}
-        {!!localStorage.getItem('token') && <Chatbot />}
+        {<Chatbot />}
         
       </main>
 
