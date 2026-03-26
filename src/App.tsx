@@ -21,25 +21,45 @@ import Chatbot from './components/Chatbot/Chatbot';
 
 // 🔐 Rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+  
+  // Mostrar loading mientras se verifica autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+  
   return isAuthenticated() ? <>{children}</> : <Navigate to="/login" />;
 };
 
 // 🌐 Rutas públicas
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+  
+  // Mostrar loading mientras se verifica autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+  
   return !isAuthenticated() ? <>{children}</> : <Navigate to="/inicio" />;
 };
 
 const AppContent: React.FC = () => {
+  const { isAuthenticated, loading } = useAuth();
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
       <main className="flex-grow">
         <Routes>
-
-
           {/* Públicas */}
           <Route path="/" element={<Home />} />
 
@@ -100,11 +120,10 @@ const AppContent: React.FC = () => {
 
           {/* Ruta por defecto si no encuentra la página */}
           <Route path="*" element={<Navigate to="/" />} />
-
         </Routes>
-        {/*Cambio para ver el chatboot*/}
-        {/* Renderiza el Chatbot en toda la plataforma si el usuario está logueado */}
-        {<Chatbot />}
+        
+        {/* ✅ CORREGIDO: Usar el contexto en lugar de localStorage */}
+        {!loading && isAuthenticated() && <Chatbot />}
         
       </main>
 
