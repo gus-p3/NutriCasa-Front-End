@@ -102,7 +102,7 @@ const AppContent: React.FC = () => {
           <Route path="*" element={<Navigate to="/" />} />
 
         </Routes>
-        
+        {/*Cambio para ver el chatboot*/}
         {/* Renderiza el Chatbot en toda la plataforma si el usuario está logueado */}
         {!!localStorage.getItem('token') && <Chatbot />}
         
