@@ -14,7 +14,7 @@ import Footer from './components/Layout/Footer';
 import Recipes from './pages/recipes/Recipes';
 import RecipeDetail from './pages/recipes/RecipeDetail';
 import RecipeCook from './pages/recipes/RecipeCook';
-import History from './pages/profile/History';
+import History from './pages/History/History';
 import AiDashboard from './pages/AiDashboard';
 import Inventory from './pages/Inventory/Inventory';
 
@@ -38,8 +38,6 @@ const AppContent: React.FC = () => {
       <main className="flex-grow">
         <Routes>
 
-          {/* 🟢 Ruta temporal para probar History */}
-          <Route path="/history" element={<History />} />
 
           {/* Públicas */}
           <Route path="/" element={<Home />} />
@@ -90,6 +88,12 @@ const AppContent: React.FC = () => {
           <Route path="/inventory" element={
             <PrivateRoute>
               <Inventory />
+            </PrivateRoute>
+          } />
+
+          <Route path="/history" element={
+            <PrivateRoute>
+              <History />
             </PrivateRoute>
           } />
 
