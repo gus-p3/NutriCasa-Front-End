@@ -17,6 +17,7 @@ import RecipeCook from './pages/recipes/RecipeCook';
 import History from './pages/History/History';
 import AiDashboard from './pages/AiDashboard';
 import Inventory from './pages/Inventory/Inventory';
+import Chatbot from './components/Chatbot/Chatbot';
 
 // 🔐 Rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -101,6 +102,10 @@ const AppContent: React.FC = () => {
           <Route path="*" element={<Navigate to="/" />} />
 
         </Routes>
+        
+        {/* Renderiza el Chatbot en toda la plataforma si el usuario está logueado */}
+        {!!localStorage.getItem('token') && <Chatbot />}
+        
       </main>
 
       <Footer />

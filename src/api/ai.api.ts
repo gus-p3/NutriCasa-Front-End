@@ -15,3 +15,8 @@ export const saveGeneratedRecipe = async (recipe: any) => {
   const response = await axios.post('/ai/save-recipe', { recipe });
   return response.data; // { message, recipe }
 };
+
+export const chatWithAssistant = async (message: string, history: any[]) => {
+  const response = await axios.post('/ai/chat', { message, history });
+  return response.data; // { response: "..." }
+};
