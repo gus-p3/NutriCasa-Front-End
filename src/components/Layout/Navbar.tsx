@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { UtensilsCrossed, LogOut, Package, BookOpen, LayoutDashboard, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { User, PlusCircle } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -18,6 +19,8 @@ const Navbar: React.FC = () => {
     { to: '/inicio',    label: 'Dashboard',  icon: <LayoutDashboard size={17} /> },
     { to: '/recipes',   label: 'Recetas',    icon: <BookOpen size={17} /> },
     { to: '/inventory', label: 'Mi Alacena', icon: <Package size={17} /> },
+    { to: '/my-recipes', label: 'Mis Recetas', icon: <User size={17} /> },
+{ to: '/create-recipe', label: 'Crear Receta', icon: <PlusCircle size={17} /> },
   ];
 
   const isActive = (to: string) =>
