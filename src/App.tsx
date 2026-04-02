@@ -1,4 +1,3 @@
-// src/App.tsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -14,10 +13,14 @@ import Footer from './components/Layout/Footer';
 import Recipes from './pages/recipes/Recipes';
 import RecipeDetail from './pages/recipes/RecipeDetail';
 import RecipeCook from './pages/recipes/RecipeCook';
+import History from './pages/profile/History';
 import History from './pages/History/History';
 import AiDashboard from './pages/AiDashboard';
 import Inventory from './pages/Inventory/Inventory';
 import Chatbot from './components/Chatbot/Chatbot';
+
+import MyRecipes from './pages/MyRecipes/MyRecipes';
+import CreateRecipe from './pages/MyRecipes/CreateRecipe';
 
 // 🔐 Rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -60,6 +63,8 @@ const AppContent: React.FC = () => {
 
       <main className="flex-grow">
         <Routes>
+
+          {/* Pública */}
           {/* Públicas */}
           <Route path="/" element={<Home />} />
 
@@ -118,6 +123,19 @@ const AppContent: React.FC = () => {
             </PrivateRoute>
           } />
 
+          <Route path="/my-recipes" element={
+            <PrivateRoute>
+              <MyRecipes />
+            </PrivateRoute>
+          } />
+
+          <Route path="/create-recipe" element={
+  <PrivateRoute>
+    <CreateRecipe />
+  </PrivateRoute>
+} />
+
+          {/* Fallback */}
           {/* Ruta por defecto si no encuentra la página */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
