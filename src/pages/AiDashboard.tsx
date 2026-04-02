@@ -53,7 +53,7 @@ const AiDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-800 font-sans pb-20">
+    <div className="min-h-screen bg-slate-50 text-gray-800 font-sans pb-40">
       
       {/* Header Minimalista */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
@@ -160,6 +160,9 @@ const AiDashboard: React.FC = () => {
             <p className="text-gray-500 text-lg">Analizando tus macros y combinando sabores únicos.</p>
           </div>
         )}
+
+        {/* Espaciador adicional para asegurar que el botón Generar no quede cubierto por el chatbot al hacer scroll */}
+        <div className="mb-20"></div>
 
         {/* Resultados */}
         {!isGenerating && generatedRecipes.length > 0 && (

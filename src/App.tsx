@@ -14,24 +14,49 @@ import Recipes from './pages/recipes/Recipes';
 import RecipeDetail from './pages/recipes/RecipeDetail';
 import RecipeCook from './pages/recipes/RecipeCook';
 import History from './pages/profile/History';
+import History from './pages/History/History';
+import AiDashboard from './pages/AiDashboard';
 import Inventory from './pages/Inventory/Inventory';
+import Chatbot from './components/Chatbot/Chatbot';
 
 import MyRecipes from './pages/MyRecipes/MyRecipes';
 import CreateRecipe from './pages/MyRecipes/CreateRecipe';
 
 // 🔐 Rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+  
+  // Mostrar loading mientras se verifica autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+  
   return isAuthenticated() ? <>{children}</> : <Navigate to="/login" />;
 };
 
 // 🌐 Rutas públicas
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+  
+  // Mostrar loading mientras se verifica autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+  
   return !isAuthenticated() ? <>{children}</> : <Navigate to="/inicio" />;
 };
 
 const AppContent: React.FC = () => {
+  const { isAuthenticated, loading } = useAuth();
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -40,6 +65,7 @@ const AppContent: React.FC = () => {
         <Routes>
 
           {/* Pública */}
+          {/* Públicas */}
           <Route path="/" element={<Home />} />
 
           <Route path="/login" element={
@@ -79,6 +105,12 @@ const AppContent: React.FC = () => {
             </PrivateRoute>
           } />
 
+          <Route path="/ai-dashboard" element={
+            <PrivateRoute>
+              <AiDashboard />
+            </PrivateRoute>
+          } />
+
           <Route path="/inventory" element={
             <PrivateRoute>
               <Inventory />
@@ -104,9 +136,13 @@ const AppContent: React.FC = () => {
 } />
 
           {/* Fallback */}
+          {/* Ruta por defecto si no encuentra la página */}
           <Route path="*" element={<Navigate to="/" />} />
-
         </Routes>
+        
+        {/* ✅ CORREGIDO: Usar el contexto en lugar de localStorage */}
+        {!loading && isAuthenticated() && <Chatbot />}
+        
       </main>
 
       <Footer />

@@ -1,7 +1,7 @@
 // src/components/Layout/Navbar.tsx
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { UtensilsCrossed, LogOut, Package, BookOpen, LayoutDashboard, Menu, X } from 'lucide-react';
+import { UtensilsCrossed, LogOut, Package, BookOpen, LayoutDashboard, Menu, X, History as HistoryIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { User, PlusCircle } from 'lucide-react';
 
@@ -21,6 +21,7 @@ const Navbar: React.FC = () => {
     { to: '/inventory', label: 'Mi Alacena', icon: <Package size={17} /> },
     { to: '/my-recipes', label: 'Mis Recetas', icon: <User size={17} /> },
 { to: '/create-recipe', label: 'Crear Receta', icon: <PlusCircle size={17} /> },
+    { to: '/history',   label: 'Historial',  icon: <HistoryIcon size={17} /> },
   ];
 
   const isActive = (to: string) =>
@@ -64,18 +65,7 @@ const Navbar: React.FC = () => {
                 <span className="text-gray-600 hidden md:block">
                   Hola, {user?.name}
                 </span>
-                <Link 
-                  to="/inicio"
-                  className="px-4 py-2 text-gray-600 hover:text-green-600 transition"
-                >
-                  Dashboard
-                </Link>
-                <Link 
-  to="/history" 
-  className="px-4 py-2 text-gray-600 hover:text-green-600 transition"
->
-  Historial
-</Link>
+
                 {/* User badge */}
                 <div className="hidden md:flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-1.5 border border-gray-100">
                   <div className="w-7 h-7 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-xs">
