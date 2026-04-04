@@ -45,7 +45,12 @@ const LoginForm: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error login:', err);
-      setError(err.message || 'Credenciales inválidas');
+      if (err.notVerified) {
+        setError('Tu cuenta aún no ha sido verificada. Revisa tu correo.');
+        // Opcional: Podríamos redirigir a un flujo de verificación aquí
+      } else {
+        setError(err.message || 'Credenciales inválidas');
+      }
     } finally {
       setLoading(false);
     }
@@ -118,6 +123,11 @@ const LoginForm: React.FC = () => {
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
+              </div>
+              <div className="flex justify-end mt-2">
+                <Link to="/forgot-password" title="Olvidaste tu contraseña" className="text-sm text-green-600 hover:text-green-700 font-medium">
+                  ¿Olvidaste tu contraseña?
+                </Link>
               </div>
             </div>
 

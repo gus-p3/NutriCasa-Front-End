@@ -6,6 +6,8 @@ import Home from './pages/Home';
 import Inicio from './pages/Inicio';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
@@ -76,6 +78,18 @@ const AppContent: React.FC = () => {
           <Route path="/register" element={
             <PublicRoute>
               <Register />
+            </PublicRoute>
+          } />
+
+          <Route path="/forgot-password" element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          } />
+
+          <Route path="/reset-password" element={
+            <PublicRoute>
+              <ResetPassword />
             </PublicRoute>
           } />
 

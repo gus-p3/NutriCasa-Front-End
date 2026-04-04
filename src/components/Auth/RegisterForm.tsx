@@ -7,7 +7,7 @@ import type { RegisterData } from '../../types';
 
 const RegisterForm: React.FC = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, verifyEmail, resendCode } = useAuth();
   
   const [formData, setFormData] = useState<RegisterData & { confirmPassword: string }>({
     name: '',
@@ -19,6 +19,10 @@ const RegisterForm: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [verificationCode, setVerificationCode] = useState<string>('');
+  const [resendLoading, setResendLoading] = useState<boolean>(false);
+  const [successMsg, setSuccessMsg] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setFormData({
@@ -58,6 +62,7 @@ const RegisterForm: React.FC = () => {
     
     setLoading(true);
     setError('');
+    setSuccessMsg('');
 
     try {
       const response = await register({
@@ -66,13 +71,52 @@ const RegisterForm: React.FC = () => {
         password: formData.password
       });
       
-      console.log('Registro exitoso:', response);
-      navigate('/setup');
+      console.log('Registro exitoso, procediendo a verificación:', response);
+      setIsVerifying(true);
+      setSuccessMsg('¡Código enviado! Revisa tu bandeja de entrada.');
     } catch (err: any) {
       console.error('Error registro:', err);
       setError(err.message || 'Error al registrar usuario');
     } finally {
       setLoading(false);
+    }
+  };
+
+
+  const handleVerify = async (e: React.FormEvent): Promise<void> => {
+    e.preventDefault();
+    if (verificationCode.length !== 6) {
+      setError('El código debe ser de 6 dígitos');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await verifyEmail(formData.email, verificationCode);
+      console.log('Correo verificado exitosamente');
+      navigate('/inicio');
+    } catch (err: any) {
+      console.error('Error verificación:', err);
+      setError(err.message || 'Código incorrecto o expirado');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendCode = async (): Promise<void> => {
+    setResendLoading(true);
+    setError('');
+    setSuccessMsg('');
+
+    try {
+      await resendCode(formData.email);
+      setSuccessMsg('Nuevo código enviado correctamente');
+    } catch (err: any) {
+      setError(err.message || 'Error al reenviar el código');
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -87,27 +131,13 @@ const RegisterForm: React.FC = () => {
           <p className="text-gray-600">Comienza tu viaje hacia una vida más saludable</p>
         </div>
 
-        {/* Tarjeta de registro */}
+        {/* Tarjeta de registro / verificación */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Crear cuenta</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            {isVerifying ? 'Verifica tu cuenta' : 'Crear cuenta'}
+          </h2>
 
-          {/* Beneficios */}
-          <div className="mb-6 p-4 bg-green-50 rounded-lg space-y-2">
-            <p className="text-sm text-green-700 flex items-center gap-2">
-              <CheckCircle size={16} className="flex-shrink-0" />
-              Planes personalizados según tus objetivos
-            </p>
-            <p className="text-sm text-green-700 flex items-center gap-2">
-              <CheckCircle size={16} className="flex-shrink-0" />
-              Cálculo automático de calorías y macros
-            </p>
-            <p className="text-sm text-green-700 flex items-center gap-2">
-              <CheckCircle size={16} className="flex-shrink-0" />
-              Adaptado a tu presupuesto y preferencias
-            </p>
-          </div>
-
-          {/* Mensaje de error */}
+          {/* Mensajes de error y éxito */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
               <AlertCircle className="text-red-500 flex-shrink-0 mt-0.5" size={18} />
@@ -115,123 +145,207 @@ const RegisterForm: React.FC = () => {
             </div>
           )}
 
-          {/* Formulario */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Nombre */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre completo
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  placeholder="Juan Pérez"
-                  className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-              </div>
+          {successMsg && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+              <CheckCircle className="text-green-500 flex-shrink-0 mt-0.5" size={18} />
+              <p className="text-sm text-green-600">{successMsg}</p>
             </div>
+          )}
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Correo electrónico
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="tu@email.com"
-                  className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
+          {isVerifying ? (
+            /* Formulario de Verificación */
+            <form onSubmit={handleVerify} className="space-y-6">
+              <div>
+                <p className="text-gray-600 text-sm mb-4">
+                  Hemos enviado un código de 6 dígitos a <strong>{formData.email}</strong>. Por favor, ingrésalo a continuación.
+                </p>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                    required
+                    placeholder="123456"
+                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-center text-2xl tracking-[0.5em] font-bold"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Contraseña */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contraseña
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Verificando...</span>
+                  </>
+                ) : (
+                  'Verificar cuenta'
+                )}
+              </button>
+
+              <div className="text-center">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  onClick={handleResendCode}
+                  disabled={resendLoading}
+                  className="text-sm text-green-600 font-semibold hover:underline disabled:opacity-50"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {resendLoading ? 'Reenviando...' : 'Reenviar código'}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-1">Mínimo 6 caracteres</p>
-            </div>
 
-            {/* Confirmar contraseña */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Confirmar contraseña
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
+              <div className="text-center pt-2">
                 <button
                   type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  onClick={() => setIsVerifying(false)}
+                  className="text-xs text-gray-400 hover:text-gray-600 transition"
                 >
-                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  Volver al registro
                 </button>
               </div>
-            </div>
+            </form>
+          ) : (
+            /* Formulario de Registro Original */
+            <>
+              {/* Beneficios */}
+              <div className="mb-6 p-4 bg-green-50 rounded-lg space-y-2">
+                <p className="text-sm text-green-700 flex items-center gap-2">
+                  <CheckCircle size={16} className="flex-shrink-0" />
+                  Planes personalizados según tus objetivos
+                </p>
+                <p className="text-sm text-green-700 flex items-center gap-2">
+                  <CheckCircle size={16} className="flex-shrink-0" />
+                  Cálculo automático de calorías y macros
+                </p>
+                <p className="text-sm text-green-700 flex items-center gap-2">
+                  <CheckCircle size={16} className="flex-shrink-0" />
+                  Adaptado a tu presupuesto y preferencias
+                </p>
+              </div>
 
-            {/* Botón de registro */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Creando cuenta...</span>
-                </>
-              ) : (
-                'Crear cuenta'
-              )}
-            </button>
-          </form>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Nombre */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre completo
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      placeholder="Juan Pérez"
+                      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
 
-          {/* Enlace a login */}
-          <p className="text-center mt-6 text-gray-600">
-            ¿Ya tienes una cuenta?{' '}
-            <Link to="/login" className="text-green-600 font-semibold hover:text-green-700">
-              Inicia sesión
-            </Link>
-          </p>
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Correo electrónico
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      placeholder="tu@email.com"
+                      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                {/* Contraseña */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Contraseña
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      placeholder="••••••••"
+                      className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Mínimo 6 caracteres</p>
+                </div>
+
+                {/* Confirmar contraseña */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirmar contraseña
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                      placeholder="••••••••"
+                      className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Botón de registro */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Creando cuenta...</span>
+                    </>
+                  ) : (
+                    'Crear cuenta'
+                  )}
+                </button>
+              </form>
+
+              {/* Enlace a login */}
+              <p className="text-center mt-6 text-gray-600">
+                ¿Ya tienes una cuenta?{' '}
+                <Link to="/login" className="text-green-600 font-semibold hover:text-green-700">
+                  Inicia sesión
+                </Link>
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>

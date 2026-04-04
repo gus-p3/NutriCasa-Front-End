@@ -12,6 +12,10 @@ interface AuthContextType {
   isAuthenticated: () => boolean;
   isAdmin: () => boolean;
   role: string | null;
+  verifyEmail: (email: string, code: string) => Promise<any>;
+  resendCode: (email: string) => Promise<any>;
+  forgotPassword: (email: string) => Promise<any>;
+  resetPassword: (resetData: any) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -62,8 +66,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const register = async (userData: RegisterData) => {
     const response = await authApi.register(userData);
+    // No establecemos el usuario aquí porque debe verificarse primero
+    return response;
+  };
+
+  const verifyEmail = async (email: string, code: string) => {
+    const response = await authApi.verifyEmail(email, code);
     setUser(response.user);
     return response;
+  };
+
+  const resendCode = async (email: string) => {
+    return await authApi.resendCode(email);
+  };
+
+  const forgotPassword = async (email: string) => {
+    return await authApi.forgotPassword(email);
+  };
+
+  const resetPassword = async (resetData: any) => {
+    return await authApi.resetPassword(resetData);
   };
 
   const logout = async () => {
@@ -81,6 +103,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       isAuthenticated: () => !!user,
       isAdmin: () => user?.role === 'admin',
       role: user?.role ?? null,
+      verifyEmail,
+      resendCode,
+      forgotPassword,
+      resetPassword,
     }}>
       {children}
     </AuthContext.Provider>
