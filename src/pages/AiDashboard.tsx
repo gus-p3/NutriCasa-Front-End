@@ -52,6 +52,13 @@ const AiDashboard: React.FC = () => {
     }
   };
 
+  const getFullImageUrl = (url: string | undefined): string => {
+    if (!url) return 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=1000';
+    if (url.startsWith('http')) return url;
+    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace('/api', '');
+    return `${baseUrl}${url}`;
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-gray-800 font-sans pb-40">
       
@@ -183,7 +190,7 @@ const AiDashboard: React.FC = () => {
                   {/* Imagen de la receta */}
                   <div 
                     className="h-56 relative p-6 flex flex-col justify-end" 
-                    style={{ backgroundImage: `url(${recipe.imageUrl || 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=800'})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                    style={{ backgroundImage: `url(${getFullImageUrl(recipe.imageUrl)})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                   >
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-300"></div>
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-green-700 uppercase tracking-widest shadow-sm z-20">
@@ -243,7 +250,7 @@ const AiDashboard: React.FC = () => {
 
               <div 
                 className="h-64 sm:h-80 w-full relative shrink-0" 
-                style={{ backgroundImage: `url(${previewRecipe.imageUrl || 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=800'})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                style={{ backgroundImage: `url(${getFullImageUrl(previewRecipe.imageUrl)})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 w-full p-6 sm:p-8 text-white z-10">

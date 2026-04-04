@@ -213,7 +213,7 @@ const RecipeCook: React.FC = () => {
       
       // Redirigir después de 2 segundos
       setTimeout(() => {
-        navigate('/recipes');
+        navigate('/inicio');
       }, 2000);
       
     } catch (error: any) {
