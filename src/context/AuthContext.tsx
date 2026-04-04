@@ -16,6 +16,8 @@ interface AuthContextType {
   resendCode: (email: string) => Promise<any>;
   forgotPassword: (email: string) => Promise<any>;
   resetPassword: (resetData: any) => Promise<any>;
+  verify2FA: (email: string, code: string) => Promise<any>;
+  toggle2FA: (enabled: boolean) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,7 +62,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (credentials: LoginCredentials) => {
     const response = await authApi.login(credentials);
+    if (!response.require2FA) {
+      setUser(response.user);
+    }
+    return response;
+  };
+
+  const verify2FA = async (email: string, code: string) => {
+    const response = await authApi.verify2FA(email, code);
     setUser(response.user);
+    return response;
+  };
+
+  const toggle2FA = async (enabled: boolean) => {
+    const response = await authApi.toggle2FA(enabled);
+    if (user) {
+      const updatedUser = { ...user, twoFactorEnabled: response.twoFactorEnabled };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
     return response;
   };
 
@@ -107,6 +127,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       resendCode,
       forgotPassword,
       resetPassword,
+      verify2FA,
+      toggle2FA,
     }}>
       {children}
     </AuthContext.Provider>
