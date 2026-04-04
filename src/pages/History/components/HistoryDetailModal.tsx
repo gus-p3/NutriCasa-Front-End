@@ -16,6 +16,13 @@ const HistoryDetailModal: React.FC<HistoryDetailModalProps> = ({ entry, onClose,
 
   const leftoversCount = countLeftoverIngredients(entry.ingredientsUsed);
 
+  const getFullImageUrl = (url: string | undefined): string => {
+    if (!url) return 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=1000';
+    if (url.startsWith('http')) return url;
+    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace('/api', '');
+    return `${baseUrl}${url}`;
+  };
+
   // Helper to extract recipe ID string (handles populated object or plain string)
   const extractRecipeId = () => {
     if (typeof entry.recipeId === 'object' && entry.recipeId !== null) {
@@ -74,7 +81,7 @@ const HistoryDetailModal: React.FC<HistoryDetailModalProps> = ({ entry, onClose,
         <div className="relative h-48 bg-gray-200 shrink-0">
           {imageUrl ? (
             <img 
-              src={imageUrl} 
+              src={getFullImageUrl(imageUrl)} 
               alt={entry.recipeName}
               className="w-full h-full object-cover"
             />

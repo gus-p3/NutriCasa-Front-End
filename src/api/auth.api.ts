@@ -1,7 +1,9 @@
 // src/api/auth.api.ts
 import axios, { type AxiosInstance, AxiosError } from 'axios';
 import type { LoginCredentials, RegisterData, AuthResponse, User, ApiError } from '../types';
-import { setAccessToken } from './api';
+import { setAccessToken, getAccessToken } from './api';
+import api from './api';
+
 
 const API_URL = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/auth`
@@ -64,7 +66,7 @@ export const authApi = {
   // ── Get profile ──────────────────────────────────────────────────────────────
   getProfile: async (): Promise<{ user: User }> => {
     try {
-      const response = await authAxios.get<{ user: User }>('/me');
+      const response = await api.get<{ user: User }>('/auth/me');
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;
@@ -75,7 +77,7 @@ export const authApi = {
   // ── Update profile ───────────────────────────────────────────────────────────
   updateProfile: async (profileData: Partial<User>): Promise<{ message: string; user: User }> => {
     try {
-      const response = await authAxios.put<{ message: string; user: User }>('/me', profileData);
+      const response = await api.put<{ message: string; user: User }>('/auth/me', profileData);
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;
@@ -86,7 +88,7 @@ export const authApi = {
   // ── Setup nutritional profile ────────────────────────────────────────────────
   setupProfile: async (setupData: any): Promise<any> => {
     try {
-      const response = await authAxios.put('/me/profile', setupData);
+      const response = await api.put('/auth/me/profile', setupData);
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;

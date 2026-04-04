@@ -181,6 +181,13 @@ const Recipes: React.FC = () => {
     return recipe.ingredients.filter((i: any) => i.status === 'red').length;
   };
 
+  const getFullImageUrl = (url: string | undefined): string => {
+    if (!url) return 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=1000';
+    if (url.startsWith('http')) return url;
+    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace('/api', '');
+    return `${baseUrl}${url}`;
+  };
+
   const missingCost = (recipe: Recipe) => {
     const missingCount = missingIngredients(recipe);
     return Math.round((missingCount / recipe.ingredients.length) * recipe.estimatedCost);
@@ -486,7 +493,7 @@ const Recipes: React.FC = () => {
                 >
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src={recipe.imageUrl}
+                      src={getFullImageUrl(recipe.imageUrl)}
                       alt={recipe.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />

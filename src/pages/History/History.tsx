@@ -32,6 +32,13 @@ const History: React.FC = () => {
     }
   };
 
+  const getFullImageUrl = (url: string | undefined): string => {
+    if (!url) return 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=1000';
+    if (url.startsWith('http')) return url;
+    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace('/api', '');
+    return `${baseUrl}${url}`;
+  };
+
   useEffect(() => {
     fetchHistory();
   }, []);
@@ -235,7 +242,7 @@ const History: React.FC = () => {
                 <div className="h-44 bg-gray-100 relative overflow-hidden">
                   {imageUrl ? (
                     <img 
-                      src={imageUrl} 
+                      src={getFullImageUrl(imageUrl)} 
                       alt={entry.recipeName}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

@@ -12,8 +12,6 @@ import { getSuggestedRecipes } from "../../services/recipes";
 import { getDashboard } from "../../services/dashboard";
 import { setupProfile, getProfile, updateProfile } from "../../services/auth";
 
-
-
 interface SetupData {
   age: string;
   weight: string;
@@ -25,46 +23,6 @@ interface SetupData {
   initialIngredients: string[];
   weeklyBudget: string;
 }
-
-// Calculadora nutricional
-const calculateNutrition = (
-  age: number,
-  weight: number,
-  height: number,
-  activityLevel: "low" | "medium" | "high",
-  goal: "lose" | "maintain" | "gain"
-) => {
-
-  const activityMultipliers = {
-    low: 1.2,
-    medium: 1.55,
-    high: 1.9
-  };
-
-  const goalAdjustment = {
-    lose: -300,
-    maintain: 0,
-    gain: 300
-  };
-
-  const bmr = 10 * weight + 6.25 * height - 5 * age;
-
-  const calories =
-    bmr * activityMultipliers[activityLevel] +
-    goalAdjustment[goal];
-
-  const proteinCalories = calories * 0.25;
-  const carbCalories = calories * 0.50;
-  const fatCalories = calories * 0.25;
-
-  return {
-    calories: Math.round(calories),
-    protein: Math.round(proteinCalories / 4),
-    carbs: Math.round(carbCalories / 4),
-    fat: Math.round(fatCalories / 9)
-  };
-};
-
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -91,15 +49,6 @@ const Home: React.FC = () => {
 
   const progress = (currentStep / 6) * 100;
   const effectRan = useRef(false);
-
-  
-  const nutrition = calculateNutrition(
-  Number(setupData.age) || 0,
-  Number(setupData.weight) || 0,
-  Number(setupData.height) || 0,
-  setupData.activityLevel,
-  setupData.goal
-);
 useEffect(() => {
 
 
@@ -576,6 +525,13 @@ const handleNextStep = async () => {
     }
   };
 
+  const getFullImageUrl = (url: string | undefined): string => {
+    if (!url) return 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=1000';
+    if (url.startsWith('http')) return url;
+    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace('/api', '');
+    return `${baseUrl}${url}`;
+  };
+
  const loadSuggestedRecipes = async () => {
   try {
 
@@ -655,10 +611,7 @@ const handleNextStep = async () => {
 
       {/* Hero section mejorado */}
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
-            ¡Bienvenido, Usuario!
-          </h1>
+        <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4 mb-8">
           {!showSetupModal && (
             <button
               onClick={() => { setShowSetupModal(true); setCurrentStep(1); }}
@@ -713,8 +666,8 @@ const handleNextStep = async () => {
                   </h3>
                   <div className="flex justify-center">
                     <CalorieCircle 
-                      consumed={dashboard.caloriesConsumed} 
-                         goal={nutrition.calories} 
+                      consumed={dashboard.today.caloriesConsumed} 
+                      goal={dashboard.today.caloriesGoal} 
                     />
 
                   </div>
@@ -736,10 +689,10 @@ const handleNextStep = async () => {
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
                           <span className="text-sm font-medium text-gray-600">Proteínas</span>
-                          <span className="text-sm font-bold text-gray-800">{nutrition.protein}g</span>
+                          <span className="text-sm font-bold text-gray-800">{dashboard.today.macros.goal.protein}g</span>
                         </div>
                         <div className="w-full bg-gray-200 h-2 rounded-full">
-                          <div className="bg-red-500 h-2 rounded-full" style={{width: `${(dashboard.macros?.protein / nutrition.protein) * 100}%`}}></div>
+                          <div className="bg-red-500 h-2 rounded-full" style={{width: `${Math.min(100, (dashboard.today.macros.consumed.protein / dashboard.today.macros.goal.protein) * 100)}%`}}></div>
                         </div>
                       </div>
                     </div>
@@ -751,10 +704,10 @@ const handleNextStep = async () => {
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
                           <span className="text-sm font-medium text-gray-600">Carbohidratos</span>
-                          <span className="text-sm font-bold text-gray-800">{nutrition.carbs}g</span>
+                          <span className="text-sm font-bold text-gray-800">{dashboard.today.macros.goal.carbs}g</span>
                         </div>
                         <div className="w-full bg-gray-200 h-2 rounded-full">
-                          <div className="bg-yellow-500 h-2 rounded-full" style={{width: `${(dashboard.macros?.carbs / 250) * 100}%`}}></div>
+                          <div className="bg-yellow-500 h-2 rounded-full" style={{width: `${Math.min(100, (dashboard.today.macros.consumed.carbs / dashboard.today.macros.goal.carbs) * 100)}%`}}></div>
                         </div>
                       </div>
                     </div>
@@ -766,11 +719,11 @@ const handleNextStep = async () => {
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
                           <span className="text-sm font-medium text-gray-600">Grasas</span>
-                          <span className="text-sm font-bold text-gray-800">{nutrition.fat}g</span>
+                          <span className="text-sm font-bold text-gray-800">{dashboard.today.macros.goal.fat}g</span>
 
                         </div>
                         <div className="w-full bg-gray-200 h-2 rounded-full">
-                          <div className="bg-green-500 h-2 rounded-full" style={{width: `${(dashboard.macros?.fat / 70) * 100}%`}}></div>
+                          <div className="bg-green-500 h-2 rounded-full" style={{width: `${Math.min(100, (dashboard.today.macros.consumed.fat / dashboard.today.macros.goal.fat) * 100)}%`}}></div>
                         </div>
                       </div>
                     </div>
@@ -788,17 +741,17 @@ const handleNextStep = async () => {
                     <DollarSign size={20} />
                     Presupuesto restante
                   </h3>
-                  <span className="text-3xl font-bold">${dashboard.budgets?.remaining}</span>
+                  <span className="text-3xl font-bold">${dashboard.budget?.remaining ?? 0}</span>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm opacity-90">
                     <span>Presupuesto semanal</span>
-                    <span>${dashboard.budgets?.weekly || setupData.weeklyBudget}</span>
+                    <span>${dashboard.budget?.weeklyLimit || setupData.weeklyBudget}</span>
                   </div>
                   <div className="w-full bg-white bg-opacity-30 h-2 rounded-full">
                     <div 
                       className="bg-white h-2 rounded-full" 
-                      style={{width: `${(dashboard.budgets?.remaining / (dashboard.budgets?.weekly || setupData.weeklyBudget)) * 100}%`}}
+                      style={{width: `${dashboard.budget?.spentPct ?? 0}%`}}
                     ></div>
                   </div>
                 </div>
@@ -811,19 +764,31 @@ const handleNextStep = async () => {
                   Progreso semanal
                 </h3>
                 <div className="grid grid-cols-7 gap-2">
-                  {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, i) => (
-                    <div key={i} className="text-center">
-                      <div className="text-xs text-gray-500 mb-1">{day}</div>
-                      <div 
-                        className={`h-10 rounded-lg flex items-center justify-center text-white text-sm font-medium
-                          ${dashboard.nutritionLogs?.[i]?.goalMet 
-                            ? 'bg-gradient-to-br from-green-500 to-green-600 shadow-md' 
-                            : 'bg-gray-200 text-gray-500'}`}
-                      >
-                        {i + 1}
+                  {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, i) => {
+                    // Mapear el día de la semana (Lunes=1, ..., Domingo=0)
+                    // El backend devuelve daysLogged y days[]
+                    // Intentamos encontrar el registro para este día específico
+                    const dayData = dashboard.week.days.find((d: any) => {
+                      const date = new Date(d.date);
+                      let dayNum = date.getDay();
+                      if (dayNum === 0) dayNum = 7; // Domingo -> 7
+                      return dayNum === (i + 1);
+                    });
+
+                    return (
+                      <div key={i} className="text-center">
+                        <div className="text-xs text-gray-500 mb-1">{day}</div>
+                        <div 
+                          className={`h-10 rounded-lg flex items-center justify-center text-white text-sm font-medium
+                            ${dayData?.goalMet 
+                              ? 'bg-gradient-to-br from-green-500 to-green-600 shadow-md' 
+                              : 'bg-gray-200 text-gray-500'}`}
+                        >
+                          {i + 1}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -899,12 +864,12 @@ const handleNextStep = async () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {recipes.map((r) => (
                 <div 
-                  key={r.id} 
+                  key={r._id} 
                   className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition cursor-pointer"
-                  onClick={() => navigate(`/recipe/${r.id}`)}
+                  onClick={() => navigate(`/recipes/${r._id}`)}
                 >
-                  {r.image ? (
-                    <img src={r.image} alt={r.title} className="w-full h-48 object-cover group-hover:scale-105 transition duration-300" />
+                  {r.imageUrl || r.image ? (
+                    <img src={getFullImageUrl(r.imageUrl || r.image)} alt={r.title} className="w-full h-48 object-cover group-hover:scale-105 transition duration-300" />
                   ) : (
                     <div className="w-full h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                       <UtensilsCrossed className="w-12 h-12 text-white opacity-50" />

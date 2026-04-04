@@ -41,6 +41,13 @@ const RecipeDetail: React.FC = () => {
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const getFullImageUrl = (url: string | undefined): string => {
+    if (!url) return 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=1000';
+    if (url.startsWith('http')) return url;
+    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace('/api', '');
+    return `${baseUrl}${url}`;
+  };
+
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -107,7 +114,7 @@ const RecipeDetail: React.FC = () => {
       {/* Imagen de cabecera */}
       <div className="relative h-64 md:h-96 w-full overflow-hidden">
         <img
-          src={recipe.imageUrl}
+          src={getFullImageUrl(recipe.imageUrl)}
           alt={recipe.title}
           className="w-full h-full object-cover"
         />

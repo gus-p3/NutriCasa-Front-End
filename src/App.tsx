@@ -13,8 +13,7 @@ import Footer from './components/Layout/Footer';
 import Recipes from './pages/recipes/Recipes';
 import RecipeDetail from './pages/recipes/RecipeDetail';
 import RecipeCook from './pages/recipes/RecipeCook';
-import History from './pages/profile/History';
-import History from './pages/History/History';
+import RecipeHistory from './pages/History/History';
 import AiDashboard from './pages/AiDashboard';
 import Inventory from './pages/Inventory/Inventory';
 import Chatbot from './components/Chatbot/Chatbot';
@@ -119,7 +118,7 @@ const AppContent: React.FC = () => {
 
           <Route path="/history" element={
             <PrivateRoute>
-              <History />
+              <RecipeHistory />
             </PrivateRoute>
           } />
 
@@ -130,10 +129,16 @@ const AppContent: React.FC = () => {
           } />
 
           <Route path="/create-recipe" element={
-  <PrivateRoute>
-    <CreateRecipe />
-  </PrivateRoute>
-} />
+            <PrivateRoute>
+              <CreateRecipe />
+            </PrivateRoute>
+          } />
+
+          <Route path="/edit-recipe/:id" element={
+            <PrivateRoute>
+              <CreateRecipe />
+            </PrivateRoute>
+          } />
 
           {/* Fallback */}
           {/* Ruta por defecto si no encuentra la página */}
