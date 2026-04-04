@@ -33,9 +33,13 @@ export const authApi = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
       const response = await authAxios.post<AuthResponse>('/login', credentials);
-      const { token, user } = response.data;
-      setAccessToken(token);                       // store access token in memory
-      localStorage.setItem('user', JSON.stringify(user));
+      const { token, user, require2FA } = response.data;
+      
+      // Solo guardar si no requiere 2FA adicional
+      if (!require2FA) {
+        setAccessToken(token);
+        localStorage.setItem('user', JSON.stringify(user));
+      }
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;
@@ -147,6 +151,30 @@ export const authApi = {
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;
       throw axiosError.response?.data || { message: 'Error al restablecer contraseña' };
+    }
+  },
+
+  // ── 2FA ──────────────────────────────────────────────────────────────────────
+  verify2FA: async (email: string, code: string): Promise<AuthResponse> => {
+    try {
+      const response = await authAxios.post<AuthResponse>('/verify-2fa', { email, code });
+      const { token, user } = response.data;
+      setAccessToken(token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiError>;
+      throw axiosError.response?.data || { message: 'Error en la verificación 2FA' };
+    }
+  },
+
+  toggle2FA: async (enabled: boolean): Promise<{ message: string; twoFactorEnabled: boolean }> => {
+    try {
+      const response = await api.put<{ message: string; twoFactorEnabled: boolean }>('/auth/me/2fa', { enabled });
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiError>;
+      throw axiosError.response?.data || { message: 'Error al cambiar 2FA' };
     }
   },
 

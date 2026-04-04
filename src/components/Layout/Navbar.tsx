@@ -62,12 +62,15 @@ const Navbar: React.FC = () => {
             {isAuthenticated() ? (
               <>
                 {/* User badge */}
-                <div className="hidden md:flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-1.5 border border-gray-100">
-                  <div className="w-7 h-7 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-xs">
+                <Link 
+                  to="/perfil" 
+                  className="hidden md:flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-1.5 border border-gray-100 hover:bg-green-50 hover:border-green-100 transition-all group"
+                >
+                  <div className="w-7 h-7 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-xs group-hover:bg-green-600 group-hover:text-white transition-colors">
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm text-gray-700 font-medium">{user?.name}</span>
-                </div>
+                  <span className="text-sm text-gray-700 font-medium group-hover:text-green-700">{user?.name}</span>
+                </Link>
 
                 {/* Logout */}
                 <button

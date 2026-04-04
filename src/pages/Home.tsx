@@ -1,7 +1,7 @@
 // src/pages/Home.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Target, Wallet, Heart, ArrowRight, Salad, TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import { Target, Wallet, Heart, ArrowRight, Salad, TrendingUp, Clock, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -59,6 +59,36 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ name, image, text, ac
 );
 
 const Home: React.FC = () => {
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+  const testimonials: TestimonialCardProps[] = [
+    {
+      name: "María González",
+      image: "https://images.unsplash.com/photo-1494790108777-466fd04c0e3b?auto=format&fit=crop&w=200&q=80",
+      text: "He perdido 8 kg en 3 meses siguiendo los planes de NutriCasa. ¡Los cálculos son perfectos para mí y nunca paso hambre!",
+      achievement: "8 kg perdidos"
+    },
+    {
+      name: "Carlos Rodríguez",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+      text: "Como vegetariano siempre me costaba saber si comía suficientes proteínas. NutriCasa me da esa tranquilidad todos los días.",
+      achievement: "+5 kg de músculo"
+    },
+    {
+      name: "Ana Martínez",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80",
+      text: "Con alergia al gluten y presupuesto ajustado, pensé que era imposible. NutriCasa me demostró que sí se puede comer sano y barato.",
+      achievement: "100% libre de gluten"
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveTestimonial(prev => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [testimonials.length]);
+
   return (
     <div className="font-sans text-gray-800 overflow-x-hidden">
       
@@ -186,8 +216,8 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Testimonials - Fondo sutil gris/verde */}
-      <section className="bg-slate-50 py-24">
+      {/* Testimonials - Carrusel Dinámico */}
+      <section className="bg-slate-50 py-24 overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
@@ -196,25 +226,40 @@ const Home: React.FC = () => {
             <p className="text-xl text-gray-600">No solo lo decimos nosotros, escucha a quienes ya transformaron su vida.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <TestimonialCard 
-              name="María González"
-              image="https://images.unsplash.com/photo-1494790108777-466fd04c0e3b?auto=format&fit=crop&w=200&q=80"
-              text="He perdido 8 kg en 3 meses siguiendo los planes de NutriCasa. ¡Los cálculos son perfectos para mí y nunca paso hambre!"
-              achievement="8 kg perdidos"
-            />
-            <TestimonialCard 
-              name="Carlos Rodríguez"
-              image="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80"
-              text="Como vegetariano siempre me costaba saber si comía suficientes proteínas. NutriCasa me da esa tranquilidad todos los días."
-              achievement="+5 kg de músculo"
-            />
-            <TestimonialCard 
-              name="Ana Martínez"
-              image="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80"
-              text="Con alergia al gluten y presupuesto ajustado, pensé que era imposible. NutriCasa me demostró que sí se puede comer sano y barato."
-              achievement="100% libre de gluten"
-            />
+          <div className="relative max-w-4xl mx-auto">
+            {/* Botones Navegación */}
+            <button 
+              onClick={() => setActiveTestimonial(prev => (prev - 1 + testimonials.length) % testimonials.length)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 z-10 p-3 bg-white rounded-full shadow-lg text-gray-400 hover:text-green-600 transition-all hover:scale-110"
+            >
+              <ChevronLeft size={28} />
+            </button>
+            <button 
+              onClick={() => setActiveTestimonial(prev => (prev + 1) % testimonials.length)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 z-10 p-3 bg-white rounded-full shadow-lg text-gray-400 hover:text-green-600 transition-all hover:scale-110"
+            >
+              <ChevronRight size={28} />
+            </button>
+
+            {/* Slide */}
+            <div className="transition-all duration-700 ease-in-out transform">
+              <TestimonialCard 
+                {...testimonials[activeTestimonial]}
+              />
+            </div>
+
+            {/* Indicadores */}
+            <div className="flex justify-center gap-3 mt-10">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveTestimonial(i)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${
+                    i === activeTestimonial ? 'w-10 bg-green-600' : 'w-2.5 bg-gray-300 hover:bg-gray-400'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>

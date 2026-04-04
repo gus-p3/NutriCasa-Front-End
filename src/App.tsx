@@ -8,8 +8,13 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Profile from './pages/Profile';
+import NotFound from './pages/NotFound';
+import ServerError from './pages/ServerError';
+import Sitemap from './pages/Sitemap';
 
 import Navbar from './components/Layout/Navbar';
+import Breadcrumbs from './components/Layout/Breadcrumbs';
 import Footer from './components/Layout/Footer';
 
 import Recipes from './pages/recipes/Recipes';
@@ -61,6 +66,7 @@ const AppContent: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
+      <Breadcrumbs />
 
       <main className="flex-grow">
         <Routes>
@@ -97,6 +103,12 @@ const AppContent: React.FC = () => {
           <Route path="/inicio" element={
             <PrivateRoute>
               <Inicio />
+            </PrivateRoute>
+          } />
+
+          <Route path="/perfil" element={
+            <PrivateRoute>
+              <Profile />
             </PrivateRoute>
           } />
 
@@ -154,9 +166,12 @@ const AppContent: React.FC = () => {
             </PrivateRoute>
           } />
 
+          <Route path="/sitemap" element={<Sitemap />} />
+          <Route path="/500" element={<ServerError />} />
+
           {/* Fallback */}
           {/* Ruta por defecto si no encuentra la página */}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         
         {/* ✅ CORREGIDO: Usar el contexto en lugar de localStorage */}

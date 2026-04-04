@@ -20,6 +20,7 @@ export interface User {
     };
   };
   weeklyBudget: number;
+  twoFactorEnabled?: boolean;
 }
 
 export interface LoginCredentials {
@@ -37,6 +38,7 @@ export interface AuthResponse {
   message: string;
   token: string;   // short-lived access token (15 min)
   user: User;
+  require2FA?: boolean;
 }
 
 export interface ApiError {

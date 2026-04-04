@@ -23,13 +23,45 @@ const RegisterForm: React.FC = () => {
   const [verificationCode, setVerificationCode] = useState<string>('');
   const [resendLoading, setResendLoading] = useState<boolean>(false);
   const [successMsg, setSuccessMsg] = useState<string>('');
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
     setError('');
+    
+    // Validación en tiempo real
+    const newErrors = { ...validationErrors };
+    
+    if (name === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (value && !emailRegex.test(value)) {
+        newErrors.email = 'Email no válido';
+      } else {
+        delete newErrors.email;
+      }
+    }
+
+    if (name === 'password') {
+      if (value && value.length < 6) {
+        newErrors.password = 'Mínimo 6 caracteres';
+      } else {
+        delete newErrors.password;
+      }
+    }
+
+    if (name === 'confirmPassword' || name === 'password') {
+      const pass = name === 'password' ? value : formData.password;
+      const confirm = name === 'confirmPassword' ? value : formData.confirmPassword;
+      
+      if (confirm && pass !== confirm) {
+        newErrors.confirmPassword = 'Las contraseñas no coinciden';
+      } else {
+        delete newErrors.confirmPassword;
+      }
+    }
+
+    setValidationErrors(newErrors);
   };
 
   const validateForm = (): boolean => {
@@ -262,9 +294,14 @@ const RegisterForm: React.FC = () => {
                       onChange={handleChange}
                       required
                       placeholder="tu@email.com"
-                      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className={`w-full pl-10 pr-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                        validationErrors.email 
+                        ? 'border-red-300 focus:ring-red-500 bg-red-50' 
+                        : 'border-gray-300 focus:ring-green-500 focus:border-transparent'
+                      }`}
                     />
                   </div>
+                  {validationErrors.email && <p className="text-xs text-red-500 mt-1">{validationErrors.email}</p>}
                 </div>
 
                 {/* Contraseña */}
@@ -281,7 +318,11 @@ const RegisterForm: React.FC = () => {
                       onChange={handleChange}
                       required
                       placeholder="••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                        validationErrors.password 
+                        ? 'border-red-300 focus:ring-red-500 bg-red-50' 
+                        : 'border-gray-300 focus:ring-green-500 focus:border-transparent'
+                      }`}
                     />
                     <button
                       type="button"
@@ -291,7 +332,11 @@ const RegisterForm: React.FC = () => {
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Mínimo 6 caracteres</p>
+                  {validationErrors.password ? (
+                    <p className="text-xs text-red-500 mt-1">{validationErrors.password}</p>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-1">Mínimo 6 caracteres</p>
+                  )}
                 </div>
 
                 {/* Confirmar contraseña */}
@@ -308,7 +353,11 @@ const RegisterForm: React.FC = () => {
                       onChange={handleChange}
                       required
                       placeholder="••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                        validationErrors.confirmPassword 
+                        ? 'border-red-300 focus:ring-red-500 bg-red-50' 
+                        : 'border-gray-300 focus:ring-green-500 focus:border-transparent'
+                      }`}
                     />
                     <button
                       type="button"
@@ -318,6 +367,7 @@ const RegisterForm: React.FC = () => {
                       {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
+                  {validationErrors.confirmPassword && <p className="text-xs text-red-500 mt-1">{validationErrors.confirmPassword}</p>}
                 </div>
 
                 {/* Botón de registro */}
