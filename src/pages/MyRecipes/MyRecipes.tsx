@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getUserRecipes, deleteRecipe } from '../../api/recipes.service';
 import type { Recipe } from '../../api/recipes.service';
 import {
@@ -12,12 +12,10 @@ import {
   PlusCircle,
   Loader2,
   User,
-  Sparkles,
-  AlertCircle
+  Sparkles
 } from 'lucide-react';
 
 const MyRecipes: React.FC = () => {
-  const navigate = useNavigate();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);

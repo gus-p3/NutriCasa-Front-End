@@ -1,7 +1,7 @@
 // src/api/auth.api.ts
 import axios, { type AxiosInstance, AxiosError } from 'axios';
 import type { LoginCredentials, RegisterData, AuthResponse, User, ApiError } from '../types';
-import { setAccessToken, getAccessToken } from './api';
+import { setAccessToken } from './api';
 import api from './api';
 
 
@@ -19,12 +19,9 @@ const authAxios: AxiosInstance = axios.create({
 export const authApi = {
 
   // ── Register ────────────────────────────────────────────────────────────────
-  register: async (userData: RegisterData): Promise<AuthResponse> => {
+  register: async (userData: RegisterData): Promise<{ message: string; email: string }> => {
     try {
-      const response = await authAxios.post<AuthResponse>('/register', userData);
-      const { token, user } = response.data;
-      setAccessToken(token);                       // store access token in memory
-      localStorage.setItem('user', JSON.stringify(user));
+      const response = await authAxios.post<{ message: string; email: string }>('/register', userData);
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ApiError>;
@@ -106,6 +103,50 @@ export const authApi = {
     } finally {
       setAccessToken(null);
       localStorage.removeItem('user');
+    }
+  },
+
+  // ── Verification & Recovery ──────────────────────────────────────────────────
+  verifyEmail: async (email: string, code: string): Promise<AuthResponse> => {
+    try {
+      const response = await authAxios.post<AuthResponse>('/verify', { email, code });
+      const { token, user } = response.data;
+      setAccessToken(token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiError>;
+      throw axiosError.response?.data || { message: 'Error al verificar email' };
+    }
+  },
+
+  resendCode: async (email: string): Promise<{ message: string }> => {
+    try {
+      const response = await authAxios.post<{ message: string }>('/resend-code', { email });
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiError>;
+      throw axiosError.response?.data || { message: 'Error al reenviar código' };
+    }
+  },
+
+  forgotPassword: async (email: string): Promise<{ message: string }> => {
+    try {
+      const response = await authAxios.post<{ message: string }>('/forgot-password', { email });
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiError>;
+      throw axiosError.response?.data || { message: 'Error al solicitar recuperación' };
+    }
+  },
+
+  resetPassword: async (resetData: any): Promise<{ message: string }> => {
+    try {
+      const response = await authAxios.post<{ message: string }>('/reset-password', resetData);
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiError>;
+      throw axiosError.response?.data || { message: 'Error al restablecer contraseña' };
     }
   },
 
