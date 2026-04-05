@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, ArrowLeft, Wand2, ChefHat, Clock, Flame, CheckCircle, Loader2, X, List, Utensils } from 'lucide-react';
-import { generateRecipes, saveGeneratedRecipe } from '../api/ai.api';
+import { generateRecipes, saveGeneratedRecipe } from '../../api/ai.api';
 
 const AiDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -18,12 +18,12 @@ const AiDashboard: React.FC = () => {
       setError('Por favor cuéntanos qué te gustaría comer.');
       return;
     }
-    
+
     try {
       setIsGenerating(true);
       setError('');
       setGeneratedRecipes([]);
-      
+
       const response = await generateRecipes({ prompt, count });
       if (response && response.recipes) {
         setGeneratedRecipes(response.recipes);
@@ -40,7 +40,7 @@ const AiDashboard: React.FC = () => {
     try {
       setIsSaving(true);
       setError('');
-      
+
       const response = await saveGeneratedRecipe(recipe);
       if (response && response.recipe && response.recipe._id) {
         navigate(`/recipes/${response.recipe._id}`);
@@ -61,11 +61,11 @@ const AiDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-gray-800 font-sans pb-40">
-      
+
       {/* Header Minimalista */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
-          <button 
+          <button
             onClick={() => navigate('/recipes')}
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition text-gray-600"
           >
@@ -78,12 +78,12 @@ const AiDashboard: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-5xl">
-        
+
         {/* Hero Section */}
         <div className="bg-gradient-to-br from-green-600 via-emerald-500 to-teal-600 rounded-[2rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden mb-12">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-20 -mt-20 mix-blend-overlay blur-xl"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-10 rounded-full -ml-16 -mb-16 mix-blend-overlay blur-lg"></div>
-          
+
           <div className="relative z-10 text-center max-w-2xl mx-auto">
             <div className="inline-flex items-center justify-center p-4 bg-white/20 rounded-full backdrop-blur-md mb-6 border border-white/30 shadow-lg animate-bounce">
               <ChefHat size={48} className="text-white" />
@@ -98,7 +98,7 @@ const AiDashboard: React.FC = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-gray-700 font-semibold mb-2 ml-1 text-lg">¿Qué se te antoja hoy?</label>
-              <textarea 
+              <textarea
                 placeholder="Ejemplo: Quiero una cena ligera pero muy alta en proteína, preferiblemente con pollo y vegetales..."
                 value={prompt}
                 onChange={e => setPrompt(e.target.value)}
@@ -107,7 +107,7 @@ const AiDashboard: React.FC = () => {
                 className="w-full border-2 border-gray-200 bg-gray-50 p-4 rounded-2xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition resize-none text-gray-700 placeholder-gray-400 font-medium"
               ></textarea>
             </div>
-            
+
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div className="flex-1">
                 <label className="block text-gray-700 font-semibold mb-2 ml-1">Opciones a generar</label>
@@ -117,11 +117,10 @@ const AiDashboard: React.FC = () => {
                       key={num}
                       onClick={() => setCount(num)}
                       disabled={isGenerating || isSaving}
-                      className={`flex-1 py-3 rounded-xl border-2 font-bold transition-all ${
-                        count === num 
-                          ? 'border-green-500 bg-green-50 text-green-700 shadow-md' 
+                      className={`flex-1 py-3 rounded-xl border-2 font-bold transition-all ${count === num
+                          ? 'border-green-500 bg-green-50 text-green-700 shadow-md'
                           : 'border-gray-200 hover:border-green-300 text-gray-500 bg-white'
-                      }`}
+                        }`}
                     >
                       {num} {num === 1 ? 'Receta' : 'Recetas'}
                     </button>
@@ -129,7 +128,7 @@ const AiDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={handleGenerate}
                 disabled={isGenerating || isSaving || !prompt.trim()}
                 className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-emerald-600 to-green-500 text-white rounded-xl hover:from-emerald-700 hover:to-green-600 transition-all font-bold shadow-xl shadow-green-200 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-1"
@@ -181,15 +180,15 @@ const AiDashboard: React.FC = () => {
               </h3>
               <p className="text-green-600 font-medium bg-green-50 px-4 py-1 rounded-full">{generatedRecipes.length} resultados</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {generatedRecipes.map((recipe, idx) => (
                 <div key={idx} className="bg-white rounded-[2rem] overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col relative group cursor-pointer" onClick={() => setPreviewRecipe(recipe)}>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none"></div>
-                  
+
                   {/* Imagen de la receta */}
-                  <div 
-                    className="h-56 relative p-6 flex flex-col justify-end" 
+                  <div
+                    className="h-56 relative p-6 flex flex-col justify-end"
                     style={{ backgroundImage: `url(${getFullImageUrl(recipe.imageUrl)})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                   >
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-300"></div>
@@ -200,12 +199,12 @@ const AiDashboard: React.FC = () => {
                       {recipe.title}
                     </h4>
                   </div>
-                  
+
                   <div className="p-6 flex-1 flex flex-col pointer-events-none">
                     <p className="text-gray-600 text-sm line-clamp-3 mb-6 flex-1 italic relative before:content-[''] before:absolute before:-left-3 before:-top-1 before:w-1 before:h-full before:bg-green-400 before:rounded-full pl-2">
                       {recipe.description}
                     </p>
-                    
+
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-6 bg-gray-50 p-4 rounded-xl border border-gray-100">
                       <div className="flex flex-col items-center gap-1">
                         <Clock size={18} className="text-indigo-500" />
@@ -222,8 +221,8 @@ const AiDashboard: React.FC = () => {
                         <span className="font-semibold text-gray-700 capitalize">{recipe.difficulty}</span>
                       </div>
                     </div>
-                    
-                    <button 
+
+                    <button
                       className="w-full bg-indigo-50 text-indigo-700 font-bold py-4 rounded-xl flex items-center justify-center gap-2 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm"
                     >
                       <List size={20} />
@@ -240,16 +239,16 @@ const AiDashboard: React.FC = () => {
         {previewRecipe && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-sm animate-fadeIn">
             <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-4xl max-h-[95vh] overflow-hidden flex flex-col animate-scaleUp relative">
-              
-              <button 
+
+              <button
                 onClick={() => setPreviewRecipe(null)}
                 className="absolute top-4 right-4 p-2 bg-black/40 hover:bg-black/60 text-white rounded-full backdrop-blur-md transition z-20"
               >
                 <X size={24} />
               </button>
 
-              <div 
-                className="h-64 sm:h-80 w-full relative shrink-0" 
+              <div
+                className="h-64 sm:h-80 w-full relative shrink-0"
                 style={{ backgroundImage: `url(${getFullImageUrl(previewRecipe.imageUrl)})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
@@ -265,25 +264,25 @@ const AiDashboard: React.FC = () => {
                 <p className="text-lg text-gray-700 mb-8 font-medium italic border-l-4 border-green-500 pl-4 bg-green-50/50 py-3 pr-3 rounded-r-xl">
                   "{previewRecipe.description}"
                 </p>
-                
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                   <div className="flex flex-col items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <span className="flex items-center gap-2 text-pink-500 mb-1"><ChefHat size={20}/></span>
+                    <span className="flex items-center gap-2 text-pink-500 mb-1"><ChefHat size={20} /></span>
                     <span className="text-sm text-gray-500 mb-1">Dificultad</span>
                     <span className="font-bold text-gray-800 capitalize">{previewRecipe.difficulty}</span>
                   </div>
                   <div className="flex flex-col items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <span className="flex items-center gap-2 text-indigo-500 mb-1"><Clock size={20}/></span>
+                    <span className="flex items-center gap-2 text-indigo-500 mb-1"><Clock size={20} /></span>
                     <span className="text-sm text-gray-500 mb-1">Tiempo</span>
                     <span className="font-bold text-gray-800">{previewRecipe.prepTimeMinutes} min</span>
                   </div>
                   <div className="flex flex-col items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <span className="flex items-center gap-2 text-orange-500 mb-1"><Flame size={20}/></span>
+                    <span className="flex items-center gap-2 text-orange-500 mb-1"><Flame size={20} /></span>
                     <span className="text-sm text-gray-500 mb-1">Calorías</span>
                     <span className="font-bold text-gray-800">{previewRecipe.nutrition?.calories} kcal</span>
                   </div>
                   <div className="flex flex-col items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <span className="flex items-center gap-2 text-green-500 mb-1"><Utensils size={20}/></span>
+                    <span className="flex items-center gap-2 text-green-500 mb-1"><Utensils size={20} /></span>
                     <span className="text-sm text-gray-500 mb-1">Costo Aprox</span>
                     <span className="font-bold text-gray-800">${previewRecipe.estimatedCost}</span>
                   </div>
@@ -301,7 +300,7 @@ const AiDashboard: React.FC = () => {
                       ))}
                     </ul>
                   </div>
-                  
+
                   <div className="space-y-8">
                     <div>
                       <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2"><Flame className="text-orange-500" /> Detalle Nutricional</h3>
@@ -324,29 +323,29 @@ const AiDashboard: React.FC = () => {
                     </div>
 
                     <div>
-                       <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2"><Wand2 className="text-purple-500" /> Pasos Rápidos</h3>
-                       <div className="space-y-4">
-                          {previewRecipe.steps?.map((step: any, idx: number) => (
-                            <div key={idx} className="flex gap-4">
-                              <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold shrink-0">{step.stepNumber}</div>
-                              <p className="text-gray-700 pt-1">{step.description}</p>
-                            </div>
-                          ))}
-                       </div>
+                      <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2"><Wand2 className="text-purple-500" /> Pasos Rápidos</h3>
+                      <div className="space-y-4">
+                        {previewRecipe.steps?.map((step: any, idx: number) => (
+                          <div key={idx} className="flex gap-4">
+                            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold shrink-0">{step.stepNumber}</div>
+                            <p className="text-gray-700 pt-1">{step.description}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="p-4 sm:p-6 bg-white border-t border-gray-200 flex flex-col sm:flex-row gap-4 items-center justify-end shrink-0 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)] z-10">
-                <button 
+                <button
                   onClick={() => setPreviewRecipe(null)}
                   disabled={isSaving}
                   className="w-full sm:w-auto px-6 py-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-all font-bold disabled:opacity-50"
                 >
                   Cancelar
                 </button>
-                <button 
+                <button
                   onClick={() => handleSaveAndView(previewRecipe)}
                   disabled={isSaving}
                   className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-emerald-600 to-green-500 text-white rounded-xl hover:from-emerald-700 hover:to-green-600 transition-all font-bold shadow-lg shadow-green-200 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-1"
@@ -369,7 +368,7 @@ const AiDashboard: React.FC = () => {
         )}
 
       </div>
-      
+
       <style>{`
         .animate-spin-slow {
           animation: spin 3s linear infinite;
