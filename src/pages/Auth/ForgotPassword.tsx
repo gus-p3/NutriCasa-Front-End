@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 const ForgotPassword: React.FC = () => {
   const { forgotPassword } = useAuth();
@@ -15,7 +15,7 @@ const ForgotPassword: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+
     try {
       await forgotPassword(email);
       setSuccess(true);

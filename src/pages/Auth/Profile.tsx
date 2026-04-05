@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { User, Mail, Shield, ShieldCheck, ShieldAlert, Key, Loader2, CheckCircle2 } from 'lucide-react';
 
 const Profile: React.FC = () => {
@@ -40,9 +40,8 @@ const Profile: React.FC = () => {
             <h2 className="text-xl font-bold text-gray-800">{user?.name}</h2>
             <p className="text-gray-500 text-sm">{user?.email}</p>
             <div className="mt-4 flex justify-center">
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                user?.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'
-              }`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${user?.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'
+                }`}>
                 {user?.role === 'admin' ? 'Administrador' : 'Usuario'}
               </span>
             </div>
@@ -78,7 +77,7 @@ const Profile: React.FC = () => {
           {/* Seguridad (2FA) */}
           <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 overflow-hidden relative">
             <div className={`absolute top-0 right-0 w-24 h-24 transform translate-x-12 -translate-y-12 rounded-full opacity-10 ${user?.twoFactorEnabled ? 'bg-green-600' : 'bg-gray-400'}`}></div>
-            
+
             <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
               <Shield size={20} className="text-green-600" /> Seguridad (2FA)
             </h3>
@@ -98,9 +97,8 @@ const Profile: React.FC = () => {
             </div>
 
             {message && (
-              <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 ${
-                message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'
-              }`}>
+              <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'
+                }`}>
                 {message.type === 'success' ? <CheckCircle2 size={18} /> : <ShieldAlert size={18} />}
                 <p className="text-sm font-medium">{message.text}</p>
               </div>
@@ -118,18 +116,16 @@ const Profile: React.FC = () => {
               <button
                 onClick={handleToggle2FA}
                 disabled={loading}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
-                  user?.twoFactorEnabled ? 'bg-green-600' : 'bg-gray-300'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${user?.twoFactorEnabled ? 'bg-green-600' : 'bg-gray-300'
+                  }`}
               >
                 <span className="sr-only">Cambiar 2FA</span>
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    user?.twoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${user?.twoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`}
                 />
                 {loading && (
-                   <Loader2 className="absolute -right-8 h-5 w-5 animate-spin text-green-600" />
+                  <Loader2 className="absolute -right-8 h-5 w-5 animate-spin text-green-600" />
                 )}
               </button>
             </div>

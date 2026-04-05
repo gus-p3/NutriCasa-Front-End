@@ -3,12 +3,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 import Home from './pages/Home';
-import Inicio from './pages/Inicio';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Profile from './pages/Profile';
+import Inicio from './pages/Profile/Inicio';
+import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
+import Profile from './pages/Auth/Profile';
 import NotFound from './pages/NotFound';
 import ServerError from './pages/ServerError';
 import Sitemap from './pages/Sitemap';
@@ -21,7 +21,7 @@ import Recipes from './pages/recipes/Recipes';
 import RecipeDetail from './pages/recipes/RecipeDetail';
 import RecipeCook from './pages/recipes/RecipeCook';
 import RecipeHistory from './pages/History/History';
-import AiDashboard from './pages/AiDashboard';
+import AiDashboard from './pages/recipes/AiDashboard';
 import Inventory from './pages/Inventory/Inventory';
 import Chatbot from './components/Chatbot/Chatbot';
 
@@ -31,7 +31,7 @@ import CreateRecipe from './pages/MyRecipes/CreateRecipe';
 // 🔐 Rutas privadas
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
-  
+
   // Mostrar loading mientras se verifica autenticación
   if (loading) {
     return (
@@ -40,14 +40,14 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       </div>
     );
   }
-  
+
   return isAuthenticated() ? <>{children}</> : <Navigate to="/login" />;
 };
 
 // 🌐 Rutas públicas
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
-  
+
   // Mostrar loading mientras se verifica autenticación
   if (loading) {
     return (
@@ -56,13 +56,13 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </div>
     );
   }
-  
+
   return !isAuthenticated() ? <>{children}</> : <Navigate to="/inicio" />;
 };
 
 const AppContent: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
-  
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -173,10 +173,10 @@ const AppContent: React.FC = () => {
           {/* Ruta por defecto si no encuentra la página */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-        
+
         {/* ✅ CORREGIDO: Usar el contexto en lugar de localStorage */}
         {!loading && isAuthenticated() && <Chatbot />}
-        
+
       </main>
 
       <Footer />
