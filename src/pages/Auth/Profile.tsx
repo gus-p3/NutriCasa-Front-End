@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usersApi } from '../../api/users.api';
 import ConfirmModal from '../../components/UI/ConfirmModal';
 import { 
-  User as UserIcon, Mail, Shield, ShieldCheck, ShieldAlert, 
+  User as UserIcon, Shield, ShieldCheck, ShieldAlert, 
   Key, Loader2, CheckCircle2, Activity, Settings, Save, AlertCircle
 } from 'lucide-react';
 
