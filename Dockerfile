@@ -24,8 +24,9 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copia desde estage 1
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copia archivo config SPA
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copia archivo config SPA preparado para inyección de Entorno
+# Nginx detectará la carpeta templates y sustituirá ${PORT} por el puerto dinámico de Railway
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 EXPOSE 80
 
