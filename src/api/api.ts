@@ -1,24 +1,24 @@
 // src/api/api.ts
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
-// ─── In-memory access token ───────────────────────────────────────────────────
-// The token lives in memory (not localStorage) to prevent XSS access.
-// It is populated after login/register/refresh and shared across all requests.
+// ─── Token de acceso en memoria ─────────────────────────────────────────────────
+// El token vive en memoria (no en localStorage) para prevenir acceso por XSS.
+// Se popula después de login/register/refresh y se comparte entre todas las peticiones.
 
 let accessToken: string | null = null;
 
 export const setAccessToken = (token: string | null) => { accessToken = token; };
 export const getAccessToken = (): string | null => accessToken;
 
-// ─── Axios instance ───────────────────────────────────────────────────────────
+// ─── Instancia de Axios ─────────────────────────────────────────────────────────
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
-  withCredentials: true,   // sends the httpOnly refresh cookie on every request
+  withCredentials: true,   // envía la cookie httpOnly de refresh en cada petición
   headers: { 'Content-Type': 'application/json' },
 });
 
-// ─── Request interceptor: attach access token ─────────────────────────────────
+// ─── Interceptor de petición: adjuntar token de acceso ─────────────────────────
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (accessToken) {
@@ -27,10 +27,10 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-// ─── Response interceptor: silent refresh ─────────────────────────────────────
-// If the server returns 401 (token expired), attempt one silent refresh using
-// the httpOnly refresh cookie. If the refresh succeeds, retry the original request.
-// If the refresh also fails, clear state and redirect to login.
+// ─── Interceptor de respuesta: refresco silencioso ─────────────────────────────
+// Si el servidor responde con 401 (token expirado), intenta un refresco silencioso
+// usando la cookie httpOnly de refresh. Si el refresco funciona, reintenta la petición original.
+// Si el refresco también falla, limpia el estado y redirige al login.
 
 let isRefreshing = false;
 let pendingQueue: Array<{
@@ -48,8 +48,8 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const original = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // Only intercept 401 errors that haven't already been retried
-    // Also skip the refresh endpoint itself to avoid infinite loops
+    // Solo intercepta errores 401 que no se hayan reintentado ya
+    // También evita el endpoint de refresh para prevenir bucles infinitos
     if (
       error.response?.status === 401 &&
       !original._retry &&
@@ -58,7 +58,7 @@ api.interceptors.response.use(
       !original.url?.includes('/register')
     ) {
       if (isRefreshing) {
-        // Queue this request until the in-flight refresh completes
+        // Encola esta petición hasta que termine el refresco en curso
         return new Promise((resolve, reject) => {
           pendingQueue.push({ resolve, reject });
         }).then(token => {
