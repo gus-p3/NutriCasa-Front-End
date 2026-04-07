@@ -43,7 +43,6 @@ const Home: React.FC = () => {
   });
 
   const [newAllergy, setNewAllergy] = useState('');
-  const [newIngredient, setNewIngredient] = useState('');
   const [error, setError] = useState('');
   const [recipes, setRecipes] = useState<any[]>([]);
   const [dashboard, setDashboard] = useState<any>(null);
