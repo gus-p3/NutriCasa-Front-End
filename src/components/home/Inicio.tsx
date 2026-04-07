@@ -26,7 +26,8 @@ interface SetupData {
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [showSetupModal, setShowSetupModal] = useState(true);
+  const [showSetupModal, setShowSetupModal] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   const [setupData, setSetupData] = useState<SetupData>({
@@ -47,7 +48,7 @@ const Home: React.FC = () => {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [dashboard, setDashboard] = useState<any>(null);
 
-  const progress = (currentStep / 6) * 100;
+  const progress = (currentStep / 5) * 100;
   const effectRan = useRef(false);
 useEffect(() => {
 
@@ -99,6 +100,8 @@ useEffect(() => {
       console.error("Error cargando datos", err);
       setShowSetupModal(true);
 
+    } finally {
+      setIsLoadingProfile(false);
     }
   };
 
@@ -192,12 +195,6 @@ const CalorieCircle = ({ consumed, goal }: { consumed: number; goal: number }) =
         }
         break;
       case 5:
-        if (setupData.initialIngredients.length === 0) { 
-          setError('Agrega al menos un ingrediente'); 
-          return false; 
-        }
-        break;
-      case 6:
         if (!setupData.weeklyBudget) { 
           setError('Ingresa tu presupuesto semanal'); 
           return false; 
@@ -213,7 +210,7 @@ const handleNextStep = async () => {
 
   if (!validateStep()) return;
 
-  if (currentStep < 6) {
+  if (currentStep < 5) {
     setCurrentStep(currentStep + 1);
     return;
   }
@@ -292,17 +289,6 @@ const handleNextStep = async () => {
 
   const removeAllergy = (allergy: string) => {
     setSetupData({...setupData, allergies: setupData.allergies.filter(a => a !== allergy)});
-  };
-
-  const addIngredient = () => {
-    if (newIngredient.trim() && !setupData.initialIngredients.includes(newIngredient.trim())) {
-      setSetupData({...setupData, initialIngredients: [...setupData.initialIngredients, newIngredient.trim()]});
-      setNewIngredient('');
-    }
-  };
-
-  const removeIngredient = (ingredient: string) => {
-    setSetupData({...setupData, initialIngredients: setupData.initialIngredients.filter(i => i !== ingredient)});
   };
 
   const getActivityIcon = (level: string) => {
@@ -469,40 +455,6 @@ const handleNextStep = async () => {
           <div className="space-y-4 animate-fadeIn">
             <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
               <span className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600">5</span>
-              Ingredientes disponibles
-            </h3>
-            <div>
-              <div className="flex gap-2">
-                <input 
-                  value={newIngredient} 
-                  onChange={e => setNewIngredient(e.target.value)} 
-                  placeholder="Ej: pollo, arroz..." 
-                  className="flex-1 border-2 border-gray-200 p-3 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition"
-                  onKeyPress={(e) => e.key === 'Enter' && addIngredient()}
-                />
-                <button 
-                  onClick={addIngredient} 
-                  className="bg-green-600 text-white px-4 rounded-xl hover:bg-green-700 transition flex items-center gap-2"
-                >
-                  <Plus size={20} />
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {setupData.initialIngredients.map(i => (
-                  <span key={i} className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                    {i}
-                    <X size={14} className="cursor-pointer hover:text-green-900" onClick={() => removeIngredient(i)} />
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      case 6:
-        return (
-          <div className="space-y-4 animate-fadeIn">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-              <span className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600">6</span>
               Presupuesto semanal
             </h3>
             <div className="relative">
@@ -547,7 +499,7 @@ const handleNextStep = async () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50">
       
       {/* Modal Setup Mejorado */}
-      {showSetupModal && (
+      {showSetupModal && !isLoadingProfile && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
           <div className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl overflow-y-auto max-h-[90vh] relative animate-slideUp">
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-green-400 to-green-600 rounded-t-3xl"></div>
@@ -568,7 +520,7 @@ const handleNextStep = async () => {
             {/* Barra de progreso mejorada */}
             <div className="mb-6">
               <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium text-gray-600">Paso {currentStep} de 6</span>
+                <span className="text-sm font-medium text-gray-600">Paso {currentStep} de 5</span>
                 <span className="text-sm font-medium text-green-600">{Math.round(progress)}%</span>
               </div>
               <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
@@ -602,7 +554,7 @@ const handleNextStep = async () => {
                 onClick={handleNextStep} 
                 className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:from-green-700 hover:to-green-600 transition font-medium shadow-lg shadow-green-200"
               >
-                {currentStep === 6 ? '✨ Finalizar' : 'Siguiente'}
+                {currentStep === 5 ? '✨ Finalizar' : 'Siguiente'}
               </button>
             </div>
           </div>
