@@ -12,7 +12,7 @@ import Profile from './pages/Auth/Profile';
 import NotFound from './pages/NotFound';
 import ServerError from './pages/ServerError';
 import Sitemap from './pages/Sitemap';
-
+//Comentario para el push
 import Navbar from './components/Layout/Navbar';
 import Breadcrumbs from './components/Layout/Breadcrumbs';
 import Footer from './components/Layout/Footer';
