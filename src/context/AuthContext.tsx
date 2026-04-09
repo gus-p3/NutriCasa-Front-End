@@ -15,7 +15,7 @@ interface AuthContextType {
   verifyEmail: (email: string, code: string) => Promise<any>;
   resendCode: (email: string) => Promise<any>;
   forgotPassword: (email: string) => Promise<any>;
-  resetPassword: (resetData: any) => Promise<any>;
+  resetPassword: (resetData: { email: string; code: string; newPassword: string }) => Promise<any>;
   verify2FA: (email: string, code: string) => Promise<any>;
   toggle2FA: (enabled: boolean) => Promise<any>;
 }
