@@ -7,6 +7,7 @@ import Inicio from './pages/profile/Inicio';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ForgotPassword from './pages/Auth/ForgotPassword';
+import VerifyResetCode from './pages/Auth/VerifyResetCode';
 import ResetPassword from './pages/Auth/ResetPassword';
 import Profile from './pages/Auth/Profile';
 import NotFound from './pages/NotFound';
@@ -90,6 +91,12 @@ const AppContent: React.FC = () => {
           <Route path="/forgot-password" element={
             <PublicRoute>
               <ForgotPassword />
+            </PublicRoute>
+          } />
+
+          <Route path="/verify-reset-code" element={
+            <PublicRoute>
+              <VerifyResetCode />
             </PublicRoute>
           } />
 

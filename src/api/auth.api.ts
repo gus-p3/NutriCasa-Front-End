@@ -144,7 +144,7 @@ export const authApi = {
     }
   },
 
-  resetPassword: async (resetData: any): Promise<{ message: string }> => {
+  resetPassword: async (resetData: { email: string; code: string; newPassword: string }): Promise<{ message: string }> => {
     try {
       const response = await authAxios.post<{ message: string }>('/reset-password', resetData);
       return response.data;

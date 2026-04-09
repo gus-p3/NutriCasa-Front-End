@@ -1,30 +1,35 @@
-// src/pages/ResetPassword.tsx
+// src/pages/Auth/ResetPassword.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const location = useLocation();
   const { resetPassword } = useAuth();
 
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  // El email y código vienen de VerifyResetCode via location.state
+  const email: string = (location.state as any)?.email || '';
+  const code: string  = (location.state as any)?.code  || '';
 
+  const [password, setPassword]               = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword]       = useState(false);
+  const [loading, setLoading]                 = useState(false);
+  const [error, setError]                     = useState('');
+  const [success, setSuccess]                 = useState(false);
+
+  // Si no hay email/código, redirigir al inicio
   useEffect(() => {
-    if (!token) {
-      setError('Token de recuperación no encontrado. Por favor, solicita uno nuevo.');
+    if (!email || !code) {
+      navigate('/forgot-password', { replace: true });
     }
-  }, [token]);
+  }, [email, code, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres');
       return;
@@ -33,13 +38,12 @@ const ResetPassword: React.FC = () => {
       setError('Las contraseñas no coinciden');
       return;
     }
-    if (!token) return;
 
     setLoading(true);
     setError('');
 
     try {
-      await resetPassword({ token, newPassword: password });
+      await resetPassword({ email, code, newPassword: password });
       setSuccess(true);
       setTimeout(() => navigate('/login'), 3000);
     } catch (err: any) {
@@ -60,7 +64,10 @@ const ResetPassword: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Restablecer contraseña</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">Nueva contraseña</h2>
+          <p className="text-gray-500 text-sm mb-6 text-center">
+            Elige una contraseña segura para tu cuenta.
+          </p>
 
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
@@ -87,6 +94,7 @@ const ResetPassword: React.FC = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Nueva contraseña */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Nueva contraseña
@@ -112,6 +120,7 @@ const ResetPassword: React.FC = () => {
                 <p className="text-xs text-gray-500 mt-1">Mínimo 6 caracteres</p>
               </div>
 
+              {/* Confirmar contraseña */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Confirmar nueva contraseña
@@ -131,7 +140,7 @@ const ResetPassword: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={loading || !token}
+                disabled={loading}
                 className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
