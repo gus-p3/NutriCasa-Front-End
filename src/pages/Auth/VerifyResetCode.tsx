@@ -13,7 +13,7 @@ const VerifyResetCode: React.FC = () => {
   const email: string = (location.state as any)?.email || '';
 
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [resending, setResending] = useState(false);
   const [error, setError] = useState('');
   const [resendMsg, setResendMsg] = useState('');
