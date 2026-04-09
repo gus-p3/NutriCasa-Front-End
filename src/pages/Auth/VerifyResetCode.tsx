@@ -73,7 +73,9 @@ const VerifyResetCode: React.FC = () => {
       setError('Por favor ingresa los 6 dígitos del código');
       return;
     }
-    // Pasar a la pantalla de nueva contraseña
+    // Guardar en sessionStorage por si el usuario recarga /reset-password
+    sessionStorage.setItem('resetEmail', email);
+    sessionStorage.setItem('resetCode', code);
     navigate('/reset-password', { state: { email, code } });
   };
 

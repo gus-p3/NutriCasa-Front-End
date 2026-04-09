@@ -10,8 +10,9 @@ const ResetPassword: React.FC = () => {
   const { resetPassword } = useAuth();
 
   // El email y código vienen de VerifyResetCode via location.state
-  const email: string = (location.state as any)?.email || '';
-  const code: string  = (location.state as any)?.code  || '';
+  // Si el usuario recargó la página, los recuperamos de sessionStorage
+  const email: string = (location.state as any)?.email || sessionStorage.getItem('resetEmail') || '';
+  const code: string  = (location.state as any)?.code  || sessionStorage.getItem('resetCode')  || '';
 
   const [password, setPassword]               = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -44,6 +45,9 @@ const ResetPassword: React.FC = () => {
 
     try {
       await resetPassword({ email, code, newPassword: password });
+      // Limpiar sessionStorage tras reset exitoso
+      sessionStorage.removeItem('resetEmail');
+      sessionStorage.removeItem('resetCode');
       setSuccess(true);
       setTimeout(() => navigate('/login'), 3000);
     } catch (err: any) {
