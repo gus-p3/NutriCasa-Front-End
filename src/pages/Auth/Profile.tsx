@@ -129,6 +129,16 @@ const Profile: React.FC = () => {
   };
 
   const executeProfileUpdate = async () => {
+    // Validaciones básicas antes de enviar
+    const age = Number(profileData.age);
+    const weight = Number(profileData.weight);
+    const height = Number(profileData.height);
+
+    if (isNaN(age) || age <= 0 || isNaN(weight) || weight <= 0 || isNaN(height) || height <= 0) {
+      setMessage({ type: 'error', text: 'Por favor, ingresa valores válidos para edad, peso y altura.' });
+      return;
+    }
+
     setSaveLoading(true);
     setMessage(null);
     try {
@@ -136,9 +146,9 @@ const Profile: React.FC = () => {
         name: profileData.name,
         email: profileData.email,
         profile: {
-          age: Number(profileData.age),
-          weight: Number(profileData.weight),
-          height: Number(profileData.height),
+          age,
+          weight,
+          height,
           activityLevel: profileData.activityLevel as any,
           goal: profileData.goal as any,
         }
