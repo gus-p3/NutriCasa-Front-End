@@ -97,6 +97,30 @@ const Home: React.FC = () => {
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80",
       text: "Con alergia al gluten y presupuesto ajustado, pensé que era imposible. NutriCasa me demostró que sí se puede comer sano y barato.",
       achievement: "100% libre de gluten"
+    },
+    {
+      name: "David Soto",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
+      text: "Como estudiante con poco tiempo, NutriCasa me salvó con sus recetas de 20 minutos. Logré mi meta de mantenimiento sin estrés.",
+      achievement: "Energía al máximo"
+    },
+    {
+      name: "Elena Rivas",
+      image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
+      text: "A mis 55 años, necesitaba controlar mi colesterol. Los planes personalizados me enseñaron a comer rico y balanceado.",
+      achievement: "Colesterol controlado"
+    },
+    {
+      name: "Javier López",
+      image: "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&w=200&q=80",
+      text: "Entreno para triatlones y necesitaba una precisión milimétrica en mis carbohidratos. NutriCasa es mi mejor herramienta de rendimiento.",
+      achievement: "PB en Triatlón"
+    },
+    {
+      name: "Lucía Méndez",
+      image: "https://images.unsplash.com/photo-1548142813-c348350df52b?auto=format&fit=crop&w=200&q=80",
+      text: "Siendo madre de tres, cocinar saludable era un reto. Ahora mis hijos aman las recetas y yo ahorro tiempo en la cocina.",
+      achievement: "Bienestar familiar"
     }
   ];
 
