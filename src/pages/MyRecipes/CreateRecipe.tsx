@@ -73,7 +73,7 @@ const CreateRecipe: React.FC = () => {
     const { name, value } = e.target;
     setForm(prev => ({
       ...prev,
-      [name]: name === 'prepTimeMinutes' || name === 'estimatedCost' ? Number(value) : value
+      [name]: name === 'prepTimeMinutes' || name === 'estimatedCost' ? Math.max(0, Number(value)) : value
     }));
   };
 
@@ -83,7 +83,7 @@ const CreateRecipe: React.FC = () => {
       ...prev,
       nutrition: {
         ...prev.nutrition,
-        [name]: Number(value)
+        [name]: Math.max(0, Number(value))
       }
     }));
   };
