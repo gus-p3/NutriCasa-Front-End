@@ -1,9 +1,9 @@
-// src/pages/RecipeDetail.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Clock, DollarSign, Flame, Star, ChefHat, ArrowLeft, Circle } from 'lucide-react';
 import api from '../../api/api';
-
+import CommentForm from '../../components/Comments/CommentForm';
+import CommentList from '../../components/Comments/CommentList';
 
 interface IngredientStatus {
   name: string;
@@ -13,7 +13,6 @@ interface IngredientStatus {
   availableQuantity?: number;
   alternativeUsed?: string;
 }
-
 
 interface RecipeDetail {
   _id: string;
@@ -34,12 +33,14 @@ interface RecipeDetail {
   userDailyCalories: number;
 }
 
-
 const RecipeDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Estado para forzar la actualización de la lista de comentarios
+  const [refresh, setRefresh] = useState(false);
 
   const getFullImageUrl = (url: string | undefined): string => {
     if (!url) return 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=1000';
@@ -47,7 +48,6 @@ const RecipeDetail: React.FC = () => {
     const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace('/api', '');
     return `${baseUrl}${url}`;
   };
-
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -63,7 +63,6 @@ const RecipeDetail: React.FC = () => {
     fetchRecipe();
   }, [id]);
 
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'green': return 'text-green-600 bg-green-50';
@@ -72,7 +71,6 @@ const RecipeDetail: React.FC = () => {
       default: return 'text-gray-600 bg-gray-50';
     }
   };
-
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -83,7 +81,6 @@ const RecipeDetail: React.FC = () => {
     }
   };
 
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -91,7 +88,6 @@ const RecipeDetail: React.FC = () => {
       </div>
     );
   }
-
 
   if (!recipe) {
     return (
@@ -104,10 +100,8 @@ const RecipeDetail: React.FC = () => {
     );
   }
 
-
   const caloriePercentage = (recipe.nutrition.calories / recipe.userDailyCalories) * 100;
   const caloriePercentageFormatted = Math.min(caloriePercentage, 100).toFixed(0);
-
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -125,7 +119,6 @@ const RecipeDetail: React.FC = () => {
           <ArrowLeft size={24} className="text-gray-700" />
         </button>
       </div>
-
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-3xl shadow-xl -mt-20 relative z-10 p-6 md:p-8">
@@ -163,7 +156,6 @@ const RecipeDetail: React.FC = () => {
             </div>
           </div>
 
-
           {/* Barra de calorías vs. diarias */}
           <div className="mb-8 p-4 bg-gray-50 rounded-xl">
             <div className="flex justify-between text-sm font-medium mb-2">
@@ -182,7 +174,6 @@ const RecipeDetail: React.FC = () => {
                 : `Representa el ${caloriePercentageFormatted}% de tus calorías diarias.`}
             </p>
           </div>
-
 
           {/* Ingredientes con semáforo */}
           <div className="mb-8">
@@ -214,9 +205,8 @@ const RecipeDetail: React.FC = () => {
             </div>
           </div>
 
-
           {/* Botón para cocinar */}
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-10">
             <button
               onClick={() => navigate(`/recipes/${id}/cook`)}
               className="bg-green-600 text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-green-700 hover:shadow-lg transition-all flex items-center gap-2"
@@ -225,11 +215,18 @@ const RecipeDetail: React.FC = () => {
               Comenzar a cocinar
             </button>
           </div>
+
+          <div className="mt-8 border-t pt-8">
+            {/* Lista de comentarios que se actualiza con 'refresh' */}
+            <CommentList recipeId={recipe._id} refresh={refresh} />
+            
+            {/* Formulario que dispara 'setRefresh' al enviar */}
+            <CommentForm recipeId={recipe._id} onCommentAdded={() => setRefresh(!refresh)} />
+          </div>
         </div>
       </div>
     </div>
   );
 };
-
 
 export default RecipeDetail;
