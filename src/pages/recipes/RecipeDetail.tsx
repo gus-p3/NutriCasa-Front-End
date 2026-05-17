@@ -4,6 +4,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Clock, DollarSign, Flame, Star, ChefHat, ArrowLeft, Circle } from 'lucide-react';
 import api from '../../api/api';
 
+import CommentList from '../../components/Comments/CommentList';
+import CommentForm from '../../components/Comments/CommentForm';
+
 
 interface IngredientStatus {
   name: string;
@@ -40,6 +43,8 @@ const RecipeDetail: React.FC = () => {
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshComments, setRefreshComments] = useState(false);
+  const handleCommentAdded = () => setRefreshComments(!refreshComments);
 
   const getFullImageUrl = (url: string | undefined): string => {
     if (!url) return 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&q=80&w=1000';
@@ -225,6 +230,13 @@ const RecipeDetail: React.FC = () => {
               Comenzar a cocinar
             </button>
           </div>
+
+          {/* Sección de comentarios  */}
+          <div className="mt-8 pt-8 border-t">
+            <CommentList recipeId={id || ''} refresh={refreshComments} isLoggedIn={true} />
+            <CommentForm recipeId={id || ''} onCommentAdded={handleCommentAdded} isLoggedIn={true} />
+          </div>
+
         </div>
       </div>
     </div>
